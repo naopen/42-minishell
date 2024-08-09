@@ -1,4 +1,6 @@
 # Project specific
+export.py
+repository_contents.txt
 
 # Executables
 *.out
