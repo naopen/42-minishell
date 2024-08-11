@@ -6,13 +6,14 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 15:33:41 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:44:11 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include "../libft/libft.h"
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>

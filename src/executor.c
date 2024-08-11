@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:18:58 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:41:57 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ int	execute_pipeline(t_command *cmd, t_env **env_head)
 	{
 		pipefd[0] = -1;
 		pipefd[1] = -1;
+		if (cmd->next && pipe(pipefd) == -1)
+			fatal_error("pipe");
 		pid = execute_command(cmd, pipefd, prev_pipefd, env_head);
 		if (waitpid(pid, &wait_status, 0) == -1)
 			fatal_error("waitpid");
@@ -51,7 +53,13 @@ pid_t	execute_command(t_command *cmd, int pipefd[2], int prev_pipefd[2],
 {
 	pid_t	pid;
 	char	*path;
+	int		stdin_copy;
+	int		stdout_copy;
 
+	stdin_copy = dup(STDIN_FILENO);
+	stdout_copy = dup(STDOUT_FILENO);
+	if (stdin_copy == -1 || stdout_copy == -1)
+		fatal_error("dup");
 	pid = fork();
 	if (pid < 0)
 		fatal_error("fork");
@@ -71,6 +79,14 @@ pid_t	execute_command(t_command *cmd, int pipefd[2], int prev_pipefd[2],
 		if (execve(path, cmd->argv, create_environ(*env_head)) == -1)
 			fatal_error("execve");
 	}
+	if (dup2(stdin_copy, STDIN_FILENO) == -1)
+		fatal_error("dup2");
+	if (dup2(stdout_copy, STDOUT_FILENO) == -1)
+		fatal_error("dup2");
+	if (close(stdin_copy) == -1)
+		fatal_error("close");
+	if (close(stdout_copy) == -1)
+		fatal_error("close");
 	return (pid);
 }
 
@@ -121,18 +137,15 @@ void	prepare_pipe(t_command *cmd, int pipefd[2], int prev_pipefd[2])
 {
 	if (cmd->next)
 	{
-		if (pipe(pipefd) == -1)
-			fatal_error("pipe");
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+			fatal_error("dup2");
+		close(pipefd[1]);
 	}
 	if (prev_pipefd[0] != -1)
 	{
-		dup2(prev_pipefd[0], STDIN_FILENO);
+		if (dup2(prev_pipefd[0], STDIN_FILENO) == -1)
+			fatal_error("dup2");
 		close_pipe(prev_pipefd);
-	}
-	if (pipefd[1] != -1)
-	{
-		dup2(pipefd[1], STDOUT_FILENO);
-		close(pipefd[1]);
 	}
 }
 

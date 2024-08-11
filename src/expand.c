@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:20:13 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:40:07 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,12 @@ char	*expand_variable(char *str, int exit_code)
                 new_str = ft_strjoin_char_free(new_str, str[i + 1]);
                 i += 2;
             }
-            else if (ft_strchr(str + i, '*') != NULL)
-				new_str = ft_strjoin_free(new_str, expand_wildcard(str + i));
+            else if (str[i] == '*')
+            {
+                new_str = ft_strjoin_free(new_str, expand_wildcard(str + i));
+                while (str[i] == '*')
+                    i++;
+            }
 			else
 			{
 				new_str = ft_strjoin_char_free(new_str, str[i]);
@@ -119,17 +123,22 @@ char	*expand_wildcard(char *str)
 	char			*new_str;
 	DIR				*dir;
 	struct dirent	*ent;
+	bool			first_match;
 
 	new_str = NULL;
 	dir = opendir(".");
 	if (dir == NULL)
 		return (ft_strdup(str));
+	first_match = true;
 	while ((ent = readdir(dir)) != NULL)
 	{
 		if (ft_fnmatch(str, ent->d_name, 0) == 0)
 		{
-			if (new_str == NULL)
+			if (first_match)
+			{
 				new_str = ft_strdup(ent->d_name);
+				first_match = false;
+			}
 			else
                 // スペース区切りで連結
                 new_str = ft_strjoin_space_free(new_str, ent->d_name);

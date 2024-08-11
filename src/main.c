@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 15:25:54 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:41:47 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,15 @@ int	main(int argc, char **argv, char **environ)
 			{
 				printf("minishell: syntax error\n");
 				exit_code = 258; // 変数名変更
+				free_tokens(tokens);
 			}
 			else
 			{
 				expand_tokens(tokens, exit_code); // 変数名変更
 				exit_code = execute_pipeline(cmd, &env_head); // 変数名変更
+				free_tokens(tokens);
+				free_commands(cmd);
 			}
-			free_tokens(tokens);
-			free_commands(cmd);
 		}
 		free(line);
 	}

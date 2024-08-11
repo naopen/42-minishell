@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:07:38 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:21:33 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:33:04 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,21 +48,25 @@ t_token	*tokenize(char *line)
 		if (is_quote(*line))
 		{
 			char	quote;
-            bool    escaped; // エスケープ判定を追加
+            bool    escaped;
 
 			quote = *line++;
-            escaped = false; // 初期状態はエスケープされていない
+            escaped = false;
 			while (*line && (escaped || *line != quote))
 			{
-                if (*line == '\\' && !escaped)
-                    escaped = true; // バックスラッシュを見つけたらエスケープ状態にする
+                if (*line == '\\' && !escaped && quote == '"')
+                    escaped = true;
                 else
-                    escaped = false; // それ以外の文字ならエスケープ状態を解除
+                    escaped = false;
 				line++;
 			}
 			if (*line == quote)
 				line++;
-			tok->next = new_token(TK_WORD, ft_strndup(start + 1, line - start - 2));
+            // シングルクォート内はエスケープしない
+			if (quote == '\'')
+				tok->next = new_token(TK_WORD, ft_strndup(start + 1, line - start - 2));
+			else
+				tok->next = new_token(TK_WORD, ft_substr(start, 1, line - start - 2));
 		}
 		else if (*line == '|')
 		{
