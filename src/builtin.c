@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:35:12 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 17:07:46 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,32 @@
 
 int	builtin_echo(char **argv)
 {
-    int	i;
-    int	newline;
+	int	i;
+	int	newline;
 
-    newline = 1;
-    i = 1;
-    if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
-    {
-        newline = 0;
-        i++;
-    }
-    while (argv[i])
-    {
-        // 空白文字の出力修正
-        printf("%s", argv[i]);
-        if (argv[i + 1])
-            printf(" ");
-        i++;
-    }
-    if (newline)
-        printf("\n");
-
-    // 終了ステータスを0に設定
-    return (0);
+	newline = 1;
+	i = 1;
+	if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
+	{
+		newline = 0;
+		i++;
+	}
+	while (argv[i])
+	{
+		printf("%s", argv[i]);
+		if (argv[i + 1])
+			printf(" ");
+		i++;
+	}
+	if (newline)
+		printf("\n");
+	return (0);
 }
 
 int	builtin_cd(char **argv)
 {
+	char	*path;
+
 	if (argv[1] == NULL)
 	{
 		char	*home;
@@ -51,20 +50,19 @@ int	builtin_cd(char **argv)
 			printf("minishell: cd: HOME not set\n");
 			return (1);
 		}
-		if (chdir(home) == -1)
-		{
-			perror("minishell: cd");
-			return (1);
-		}
+		path = home;
 	}
 	else
+		path = expand_variable(argv[1], 0);
+	if (chdir(path) == -1)
 	{
-		if (chdir(argv[1]) == -1)
-		{
-			perror("minishell: cd");
-			return (1);
-		}
+		perror("minishell: cd");
+		if (argv[1] != NULL)
+			free(path);
+		return (1);
 	}
+	if (argv[1] != NULL)
+		free(path);
 	return (0);
 }
 

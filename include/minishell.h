@@ -6,14 +6,14 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:44:11 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 17:47:46 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../libft/libft.h"
+# include "../libft/libft.h" // libft.h をインクルードすることでlibftの関数が使える
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
@@ -80,27 +80,14 @@ typedef struct s_env
 }	t_env;
 
 // utils.c
+// libftに存在する関数を削除
 void	fatal_error(const char *msg);
-size_t		ft_strlen(const char *s);
 char	*ft_strndup(const char *s, size_t n);
-char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strdup(const char *s);
-char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strjoin_char_free(char *s1, char s2);
 char	*ft_strjoin_free(char *s1, char *s2);
 char	*ft_strjoin_space_free(char *s1, char *s2);
-size_t	ft_strlcpy(char *dst, const char *src, size_t size);
-size_t	ft_strlcat(char *dst, const char *src, size_t size);
-int		ft_strcmp(const char *s1, const char *s2);
-int		ft_strncmp(const char *s1, const char *s2, size_t n);
 char	*ft_strtok(char *str, const char *delim);
-int		ft_isalnum(int c);
-int		ft_atoi(const char *str);
-char	*ft_itoa(int n);
 int		ft_fnmatch(const char *pattern, const char *string, int flags);
-char	*ft_strchr(const char *s, int c);
-void	ft_putendl_fd(char *s, int fd);
-
 
 // lexer.c
 t_token	*tokenize(char *line);

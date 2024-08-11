@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:07:38 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:33:04 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 17:14:38 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,13 @@ t_token	*tokenize(char *line)
 	t_token	head;
 	t_token	*tok;
 	char	*start;
+	bool	escaped;
 
 	head.next = NULL;
 	tok = &head;
 	while (*line)
 	{
+		escaped = false;
 		while (*line == ' ')
 			line++;
 		if (*line == '\0')
@@ -48,23 +50,21 @@ t_token	*tokenize(char *line)
 		if (is_quote(*line))
 		{
 			char	quote;
-            bool    escaped;
 
 			quote = *line++;
-            escaped = false;
 			while (*line && (escaped || *line != quote))
 			{
-                if (*line == '\\' && !escaped && quote == '"')
-                    escaped = true;
-                else
-                    escaped = false;
+				if (*line == '\\' && !escaped && quote == '"')
+					escaped = true;
+				else
+					escaped = false;
 				line++;
 			}
 			if (*line == quote)
 				line++;
-            // シングルクォート内はエスケープしない
 			if (quote == '\'')
-				tok->next = new_token(TK_WORD, ft_strndup(start + 1, line - start - 2));
+				tok->next = new_token(TK_WORD,
+						ft_strndup(start + 1, line - start - 2));
 			else
 				tok->next = new_token(TK_WORD, ft_substr(start, 1, line - start - 2));
 		}
@@ -88,13 +88,11 @@ t_token	*tokenize(char *line)
 		}
 		else
 		{
-            // 単語分割時の空白処理を修正
 			while (*line != ' ' && *line != '\0' && !is_quote(*line)
 				&& *line != '|' && *line != '>' && *line != '<')
 			{
-                // エスケープシーケンスの処理
-                if (*line == '\\' && *(line + 1) != '\0')
-                    line++;
+				if (*line == '\\' && *(line + 1) == '\n')
+					line++;
 				line++;
 			}
 			tok->next = new_token(TK_WORD, ft_strndup(start, line - start));

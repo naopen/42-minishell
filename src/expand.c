@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:40:07 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 17:14:08 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,8 @@ char	*expand_variable(char *str, int exit_code)
 	i = 0;
 	while (str[i])
 	{
-		// ダブルクォート内でも変数展開
 		if (str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_'
-			|| str[i + 1] == '?'))
+				|| str[i + 1] == '?'))
 		{
 			i++;
 			if (str[i] == '?')
@@ -63,25 +62,21 @@ char	*expand_variable(char *str, int exit_code)
 				i = j;
 			}
 		}
+		else if (str[i] == '\\' && (str[i + 1] == '$' || str[i + 1] == '\\' || str[i + 1] == '"'))
+		{
+			new_str = ft_strjoin_char_free(new_str, str[i + 1]);
+			i += 2;
+		}
+        else if (str[i] == '*')
+        {
+            new_str = ft_strjoin_free(new_str, expand_wildcard(str + i));
+            while (str[i] == '*')
+                i++;
+        }
 		else
 		{
-			// エスケープシーケンスの処理を追加
-            if (str[i] == '\\' && str[i + 1] != '\0')
-            {
-                new_str = ft_strjoin_char_free(new_str, str[i + 1]);
-                i += 2;
-            }
-            else if (str[i] == '*')
-            {
-                new_str = ft_strjoin_free(new_str, expand_wildcard(str + i));
-                while (str[i] == '*')
-                    i++;
-            }
-			else
-			{
-				new_str = ft_strjoin_char_free(new_str, str[i]);
-				i++;
-			}
+			new_str = ft_strjoin_char_free(new_str, str[i]);
+			i++;
 		}
 	}
 	return (new_str);
@@ -140,8 +135,7 @@ char	*expand_wildcard(char *str)
 				first_match = false;
 			}
 			else
-                // スペース区切りで連結
-                new_str = ft_strjoin_space_free(new_str, ent->d_name);
+				new_str = ft_strjoin_space_free(new_str, ent->d_name);
 		}
 	}
 	closedir(dir);
