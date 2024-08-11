@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:14:08 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 23:10:21 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,24 @@ char	*expand_variable(char *str, int exit_code)
 	char	*value;
 	size_t	i;
 	size_t	j;
+	bool	in_double_quotes;
 
 	new_str = ft_strdup("");
 	if (new_str == NULL)
 		fatal_error("malloc");
 	i = 0;
+	in_double_quotes = false;
 	while (str[i])
 	{
+		if (str[i] == '"')
+			in_double_quotes = !in_double_quotes;
 		if (str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_'
-				|| str[i + 1] == '?'))
+				|| (str[i + 1] == '?' && in_double_quotes)))
 		{
 			i++;
 			if (str[i] == '?')
 			{
-				new_str = ft_strjoin_free(new_str,
-						expand_special_parameter(str + i, exit_code));
+				new_str = ft_strjoin_free(new_str, ft_itoa(exit_code));
 				i++;
 			}
 			else
@@ -62,12 +65,13 @@ char	*expand_variable(char *str, int exit_code)
 				i = j;
 			}
 		}
-		else if (str[i] == '\\' && (str[i + 1] == '$' || str[i + 1] == '\\' || str[i + 1] == '"'))
+		else if (str[i] == '\\' && in_double_quotes
+			&& (str[i + 1] == '$' || str[i + 1] == '\\' || str[i + 1] == '"'))
 		{
 			new_str = ft_strjoin_char_free(new_str, str[i + 1]);
 			i += 2;
 		}
-        else if (str[i] == '*')
+        else if (str[i] == '*' && !in_double_quotes)
         {
             new_str = ft_strjoin_free(new_str, expand_wildcard(str + i));
             while (str[i] == '*')

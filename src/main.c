@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:21:11 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 23:09:46 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,14 @@ int	main(int argc, char **argv, char **environ)
 			{
 				expand_tokens(tokens, exit_code);
 				exit_code = execute_pipeline(cmd, &env_head);
+				if (exit_code == EXIT_SUCCESS) // exitコマンドが成功した場合はループを終了
+					break ;
 				free_tokens(tokens);
 				free_commands(cmd);
 			}
 		}
 		free(line);
+		rl_clear_history(); // 履歴をクリア
 	}
 	free_env_list(env_head);
 	return (exit_code);

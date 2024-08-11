@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:07:46 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 23:13:09 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	builtin_cd(char **argv)
 		path = home;
 	}
 	else
-		path = expand_variable(argv[1], 0);
+		path = expand_variable(argv[1], 0); // 環境変数を展開
 	if (chdir(path) == -1)
 	{
 		perror("minishell: cd");
@@ -112,10 +112,10 @@ int	builtin_export(char **argv, t_env **env_head)
 	i = 1;
 	while (argv[i])
 	{
-		if (ft_strchr(argv[i], '=') == NULL)
+		if (!is_valid_identifier(argv[i])) // 識別子のバリデーション
 		{
 			printf("minishell: export: `%s': not a valid identifier\n", argv[i]);
-			return (1);
+			return (1); // bashと同じexit status
 		}
 		key = ft_strndup(argv[i], ft_strchr(argv[i], '=') - argv[i]);
 		if (key == NULL)
