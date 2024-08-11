@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:09:01 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:23:19 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,29 @@
 
 int	builtin_echo(char **argv)
 {
-	int	i;
-	int	newline;
+    int	i;
+    int	newline;
 
-	newline = 1;
-	i = 1;
-	if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
-	{
-		newline = 0;
-		i++;
-	}
-	while (argv[i])
-	{
-		printf("%s", argv[i]);
-		if (argv[i + 1])
-			printf(" ");
-		i++;
-	}
-	if (newline)
-		printf("\n");
-	return (0);
+    newline = 1;
+    i = 1;
+    if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
+    {
+        newline = 0;
+        i++;
+    }
+    while (argv[i])
+    {
+        // 空白文字の出力修正
+        printf("%s", argv[i]);
+        if (argv[i + 1])
+            printf(" ");
+        i++;
+    }
+    if (newline)
+        printf("\n");
+
+    // 終了ステータスを0に設定
+    return (0);
 }
 
 int	builtin_cd(char **argv)

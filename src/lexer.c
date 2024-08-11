@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:07:38 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:08:06 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:21:33 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,18 @@ t_token	*tokenize(char *line)
 		if (is_quote(*line))
 		{
 			char	quote;
+            bool    escaped; // エスケープ判定を追加
 
 			quote = *line++;
-			while (*line && *line != quote)
+            escaped = false; // 初期状態はエスケープされていない
+			while (*line && (escaped || *line != quote))
+			{
+                if (*line == '\\' && !escaped)
+                    escaped = true; // バックスラッシュを見つけたらエスケープ状態にする
+                else
+                    escaped = false; // それ以外の文字ならエスケープ状態を解除
 				line++;
+			}
 			if (*line == quote)
 				line++;
 			tok->next = new_token(TK_WORD, ft_strndup(start + 1, line - start - 2));
@@ -76,9 +84,15 @@ t_token	*tokenize(char *line)
 		}
 		else
 		{
+            // 単語分割時の空白処理を修正
 			while (*line != ' ' && *line != '\0' && !is_quote(*line)
 				&& *line != '|' && *line != '>' && *line != '<')
+			{
+                // エスケープシーケンスの処理
+                if (*line == '\\' && *(line + 1) != '\0')
+                    line++;
 				line++;
+			}
 			tok->next = new_token(TK_WORD, ft_strndup(start, line - start));
 		}
 		if (tok->next == NULL)

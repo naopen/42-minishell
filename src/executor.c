@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 15:32:37 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 16:18:58 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,13 @@ int	execute_pipeline(t_command *cmd, t_env **env_head)
 		pid = execute_command(cmd, pipefd, prev_pipefd, env_head);
 		if (waitpid(pid, &wait_status, 0) == -1)
 			fatal_error("waitpid");
-		exit_code = WEXITSTATUS(wait_status);
+
+		// 終了コードの取得を修正
+		if (WIFEXITED(wait_status))
+			exit_code = WEXITSTATUS(wait_status);
+		else if (WIFSIGNALED(wait_status))
+            exit_code = 128 + WTERMSIG(wait_status);
+
 		if (prev_pipefd[0] != -1)
 			close_pipe(prev_pipefd);
 		prev_pipefd[0] = pipefd[0];
