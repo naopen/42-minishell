@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:53:44 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 15:25:54 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,13 @@ int	main(int argc, char **argv, char **environ)
 	t_token		*tokens;
 	t_command	*cmd;
 	t_env		*env_head;
-	int			status;
+	int			exit_code; // 変数名変更
 
 	(void)argc;
 	(void)argv;
 	env_head = create_env_list(environ);
 	setup_signal_handlers();
+	exit_code = 0; // 変数名変更
 	while (1)
 	{
 		line = readline(PROMPT);
@@ -37,13 +38,12 @@ int	main(int argc, char **argv, char **environ)
 			if (cmd == NULL)
 			{
 				printf("minishell: syntax error\n");
-				g_last_exit_status = 258;
+				exit_code = 258; // 変数名変更
 			}
 			else
 			{
-				expand_tokens(tokens, g_last_exit_status);
-				status = execute_pipeline(cmd, &env_head);
-				g_last_exit_status = status;
+				expand_tokens(tokens, exit_code); // 変数名変更
+				exit_code = execute_pipeline(cmd, &env_head); // 変数名変更
 			}
 			free_tokens(tokens);
 			free_commands(cmd);
@@ -51,7 +51,7 @@ int	main(int argc, char **argv, char **environ)
 		free(line);
 	}
 	free_env_list(env_head);
-	return (0);
+	return (exit_code); // 変数名変更
 }
 
 void	free_tokens(t_token *tokens)

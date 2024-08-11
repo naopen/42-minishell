@@ -1,4 +1,6 @@
 # Project specific
+minishell
+minishell_tester/
 export.py
 repository_contents.txt
 

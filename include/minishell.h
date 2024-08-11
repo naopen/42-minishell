@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 18:31:29 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 15:33:41 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@
 # define ERROR_TOKENIZE 1
 # define ERROR_OPEN_REDIR 2
 # define FNM_NOMATCH 1
-
-int	g_last_exit_status = 0;
 
 typedef enum e_token_kind
 {

@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:10:20 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 15:29:52 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	handle_sigint(int sig)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	g_last_exit_status = 1;
 }
 
 void	setup_signal_handlers(void)

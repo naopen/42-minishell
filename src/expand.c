@@ -6,13 +6,13 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:09:57 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 15:27:03 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	expand_tokens(t_token *tokens, int last_status)
+void	expand_tokens(t_token *tokens, int exit_code)
 {
 	while (tokens)
 	{
@@ -20,7 +20,7 @@ void	expand_tokens(t_token *tokens, int last_status)
 		{
 			char	*expanded_str;
 
-			expanded_str = expand_variable(tokens->str, last_status);
+			expanded_str = expand_variable(tokens->str, exit_code);
 			free(tokens->str);
 			tokens->str = expanded_str;
 		}
@@ -28,7 +28,7 @@ void	expand_tokens(t_token *tokens, int last_status)
 	}
 }
 
-char	*expand_variable(char *str, int last_status)
+char	*expand_variable(char *str, int exit_code)
 {
 	char	*new_str;
 	char	*value;
@@ -47,7 +47,7 @@ char	*expand_variable(char *str, int last_status)
 			if (str[i] == '?')
 			{
 				new_str = ft_strjoin_free(new_str,
-						expand_special_parameter(str + i, last_status));
+						expand_special_parameter(str + i, exit_code));
 				i++;
 			}
 			else
@@ -75,13 +75,13 @@ char	*expand_variable(char *str, int last_status)
 	return (new_str);
 }
 
-char	*expand_special_parameter(char *str, int last_status)
+char	*expand_special_parameter(char *str, int exit_code)
 {
 	if (ft_strncmp(str, "?", 1) == 0)
 	{
 		char	*status_str;
 
-		status_str = ft_itoa(last_status);
+		status_str = ft_itoa(exit_code);
 		if (status_str == NULL)
 			fatal_error("malloc");
 		return (status_str);

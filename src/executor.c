@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:42:23 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 15:32:37 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,26 +17,27 @@ int	execute_pipeline(t_command *cmd, t_env **env_head)
 	int		pipefd[2];
 	int		prev_pipefd[2];
 	pid_t	pid;
-	int		status;
+	int		wait_status;
+	int		exit_code;
 
 	prev_pipefd[0] = -1;
 	prev_pipefd[1] = -1;
+	exit_code = 0;
 	while (cmd)
 	{
 		pipefd[0] = -1;
 		pipefd[1] = -1;
 		pid = execute_command(cmd, pipefd, prev_pipefd, env_head);
-		// 子プロセスの終了を待つ
-		if (waitpid(pid, &status, 0) == -1)
+		if (waitpid(pid, &wait_status, 0) == -1)
 			fatal_error("waitpid");
+		exit_code = WEXITSTATUS(wait_status);
 		if (prev_pipefd[0] != -1)
 			close_pipe(prev_pipefd);
 		prev_pipefd[0] = pipefd[0];
 		prev_pipefd[1] = pipefd[1];
 		cmd = cmd->next;
 	}
-	// 最後のコマンドの終了ステータスを返す
-	return (WEXITSTATUS(status));
+	return (exit_code);
 }
 
 pid_t	execute_command(t_command *cmd, int pipefd[2], int prev_pipefd[2],
