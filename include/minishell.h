@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:47:46 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 23:33:54 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ typedef struct s_env
 }	t_env;
 
 // utils.c
-// libftに存在する関数を削除
 void	fatal_error(const char *msg);
 char	*ft_strndup(const char *s, size_t n);
 char	*ft_strjoin_char_free(char *s1, char s2);
@@ -88,6 +87,7 @@ char	*ft_strjoin_free(char *s1, char *s2);
 char	*ft_strjoin_space_free(char *s1, char *s2);
 char	*ft_strtok(char *str, const char *delim);
 int		ft_fnmatch(const char *pattern, const char *string, int flags);
+bool	is_valid_identifier(char *str);
 
 // lexer.c
 t_token	*tokenize(char *line);

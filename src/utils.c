@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/09 20:19:44 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/11 23:33:21 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,4 +156,22 @@ int	ft_fnmatch(const char *pattern, const char *string, int flags)
 		return (ft_fnmatch(pattern + 1, string, flags)
 			|| ft_fnmatch(pattern, string + 1, flags));
 	return (FNM_NOMATCH);
+}
+
+// exportの識別子として有効かどうかを判定する関数
+bool	is_valid_identifier(char *str)
+{
+	size_t	i;
+
+	i = 0;
+	if (!ft_isalpha(str[i]) && str[i] != '_')
+		return (false);
+	i++;
+	while (str[i] && str[i] != '=')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+			return (false);
+		i++;
+	}
+	return (true);
 }
