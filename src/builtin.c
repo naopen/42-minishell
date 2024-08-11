@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 23:13:09 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/12 01:27:39 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	builtin_exit(char **argv)
 			return (255);
 		}
 		exit_status = ft_atoi(argv[1]);
-		if (exit_status < 0 || exit_status > 255)
+		if (exit_status < 0 || exit_status > 255) // exit status が 0 ~ 255 の範囲外の場合の処理を追加
 		{
 			printf("minishell: exit: numeric argument required\n");
 			return (255);

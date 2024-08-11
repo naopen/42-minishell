@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 23:10:55 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/12 01:26:13 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ pid_t	execute_command(t_command *cmd, int pipefd[2], int prev_pipefd[2],
 	char	*path;
 	int		stdin_copy;
 	int		stdout_copy;
+	int		wait_status;
 
 	stdin_copy = dup(STDIN_FILENO);
 	stdout_copy = dup(STDOUT_FILENO);
@@ -75,6 +76,8 @@ pid_t	execute_command(t_command *cmd, int pipefd[2], int prev_pipefd[2],
 		if (execve(path, cmd->argv, create_environ(*env_head)) == -1)
 			fatal_error("execve");
 	}
+	if (waitpid(pid, &wait_status, 0) == -1) // 子プロセスの終了を待つ
+		fatal_error("waitpid");
 	if (dup2(stdin_copy, STDIN_FILENO) == -1)
 		fatal_error("dup2");
 	if (dup2(stdout_copy, STDOUT_FILENO) == -1)
@@ -92,6 +95,7 @@ char	*find_command_path(char *command)
 	char	*path;
 	char	*dir;
 	size_t	len;
+	char	*full_path;
 
 	path_env = getenv("PATH");
 	if (path_env == NULL)
@@ -103,7 +107,7 @@ char	*find_command_path(char *command)
 	while (dir != NULL)
 	{
 		len = ft_strlen(dir) + ft_strlen(command) + 2;
-		char *full_path = malloc(len);
+		full_path = malloc(len);
 		if (full_path == NULL)
 			fatal_error("malloc");
 		ft_strlcpy(full_path, dir, len);
@@ -149,9 +153,8 @@ int	is_builtin(char *command)
 {
 	return (ft_strcmp(command, "echo") == 0 || ft_strcmp(command, "cd") == 0 ||
 			ft_strcmp(command, "pwd") == 0 || ft_strcmp(command, "exit") == 0
-			|| ft_strcmp(command, "export") == 0
-			|| ft_strcmp(command, "unset") == 0
-			|| ft_strcmp(command, "env") == 0);
+				|| ft_strcmp(command, "export") == 0 || ft_strcmp(command,
+					"unset") == 0 || ft_strcmp(command, "env") == 0);
 }
 
 int	execute_builtin(char *command, char **argv, t_env **env_head)
