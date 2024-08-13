@@ -1,14 +1,12 @@
 name: pr-agent
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
-  issue_comment:
-    types: [created, edited]
-
-permissions:
-  pull-requests: write
-  issues: write
+  # pull_request:
+  #   types: [opened, reopened, synchronize]
+  # issue_comment:
+  #   types: [created, edited]
+  issues:
+    types: [opened, reopened]
 
 jobs:
   pr_agent_job:
@@ -18,7 +16,7 @@ jobs:
       issues: write
       pull-requests: write
       contents: write
-    name: Run pr agent on every pull request, respond to user comments
+    name: Run pr agent on every issue
     steps:
       - name: PR Agent action step
         id: pragent
