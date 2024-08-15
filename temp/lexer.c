@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:07:38 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:14:38 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/15 17:36:00 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_token	*new_token(t_token_kind kind, char *str)
 
 	tok = (t_token *)malloc(sizeof(t_token));
 	if (tok == NULL)
-		fatal_error("malloc");
+		exit_with_error("malloc");
 	tok->kind = kind;
 	tok->str = str;
 	tok->next = NULL;
@@ -98,7 +98,7 @@ t_token	*tokenize(char *line)
 			tok->next = new_token(TK_WORD, ft_strndup(start, line - start));
 		}
 		if (tok->next == NULL)
-			fatal_error("malloc");
+			exit_with_error("malloc");
 		tok = tok->next;
 	}
 	tok->next = new_token(TK_EOF, NULL);

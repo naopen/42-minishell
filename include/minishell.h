@@ -6,147 +6,148 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:47:46 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/15 17:35:28 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../libft/libft.h" // libft.h をインクルードすることでlibftの関数が使える
+# include "../libft/libft.h"
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <string.h>
+# include <stdbool.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <sys/wait.h>
-# include <sys/types.h>
-# include <sys/stat.h>
 # include <fcntl.h>
-# include <dirent.h>
+# include <limits.h>
 # include <errno.h>
 # include <signal.h>
-# include <limits.h>
-# include <stdbool.h>
 
-# define PROMPT "minishell$ "
-# define REDIR_OUTPUT 1
-# define REDIR_APPEND 2
-# define REDIR_INPUT 3
-# define REDIR_HEREDOC 4
-# define ERROR_TOKENIZE 1
+# define SYNTAX_ERROR 1
 # define ERROR_OPEN_REDIR 2
-# define FNM_NOMATCH 1
+# define HEREDOC_TMPFILE "/tmp/minishell_heredoc.tmp"
 
-typedef enum e_token_kind
+typedef enum e_token_type
 {
-	TK_WORD,
-	TK_REDIR_OUTPUT,
-	TK_REDIR_APPEND,
-	TK_REDIR_INPUT,
-	TK_REDIR_HEREDOC,
-	TK_PIPE,
-	TK_EOF,
-}	t_token_kind;
+	TOKEN_WORD,
+	TOKEN_OPERATOR,
+	TOKEN_REDIRECT_IN,
+	TOKEN_REDIRECT_OUT,
+	TOKEN_REDIRECT_APPEND,
+	TOKEN_HEREDOC,
+	TOKEN_EOF,
+}	t_token_type;
 
 typedef struct s_token
 {
-	t_token_kind	kind;
-	char			*str;
+	t_token_type	type;
+	char			*word;
 	struct s_token	*next;
 }	t_token;
 
+typedef enum e_node_type
+{
+	NODE_COMMAND,
+	NODE_PIPE,
+}	t_node_type;
+
+typedef enum e_redirect_type
+{
+	REDIRECT_IN,
+	REDIRECT_OUT,
+	REDIRECT_APPEND,
+	REDIRECT_HEREDOC,
+}	t_redirect_type;
+
 typedef struct s_redirect
 {
-	int				type;
-	int				fd;
-	char			*filename;
+	t_redirect_type	type;
+	char			*file_name;
 	struct s_redirect	*next;
 }	t_redirect;
 
-typedef struct s_command
+typedef struct s_node
 {
+	t_node_type		type;
 	char			**argv;
-	t_redirect		*redirects;
-	struct s_command	*next;
-}	t_command;
+	struct s_redirect	*redirects;
+	struct s_node		*next;
+}	t_node;
 
 typedef struct s_env
 {
-	char			*key;
+	char			*name;
 	char			*value;
-	struct s_env	*next;
+	struct s_env		*next;
 }	t_env;
 
-// utils.c
-// libftに存在する関数を削除
-void	fatal_error(const char *msg);
-char	*ft_strndup(const char *s, size_t n);
-char	*ft_strjoin_char_free(char *s1, char s2);
-char	*ft_strjoin_free(char *s1, char *s2);
-char	*ft_strjoin_space_free(char *s1, char *s2);
-char	*ft_strtok(char *str, const char *delim);
-int		ft_fnmatch(const char *pattern, const char *string, int flags);
+typedef enum e_builtin_type
+{
+	BUILTIN_ECHO,
+	BUILTIN_CD,
+	BUILTIN_PWD,
+	BUILTIN_EXPORT,
+	BUILTIN_UNSET,
+	BUILTIN_ENV,
+	BUILTIN_EXIT,
+	BUILTIN_UNKNOWN,
+}	t_builtin_type;
 
-// lexer.c
+/*
+** utils.c
+*/
+void	exit_with_error(const char *msg);
+bool	ft_isnumber(const char *str);
+char	*ft_strndup(const char *s1, size_t n);
+void	ft_strdel(char **as);
+void	ft_strarrdel(char **arr);
+int		ft_strarrlen(char **arr);
+char	**ft_strarradd(char **arr, char *str);
+
+/*
+** tokenizer.c
+*/
 t_token	*tokenize(char *line);
-t_token	*new_token(t_token_kind kind, char *str);
+void	free_token_list(t_token *token_list);
+bool	is_quote(char c);
 
-// parser.c
-t_command	*parse(t_token *tokens);
-t_command	*new_command(void);
-t_redirect	*new_redirect(t_token *tokens);
-void		append_tok(t_token **tokens, t_token *tok);
-void		append_redirect(t_redirect **redirects, t_redirect *redir);
+/*
+** parser.c
+*/
+t_node	*parse(t_token **token_list);
+void	free_ast(t_node *ast);
 
-// executor.c
-int			execute_pipeline(t_command *cmd, t_env **env_head);
-pid_t		execute_command(t_command *cmd, int pipefd[2],
-				int prev_pipefd[2], t_env **env_head);
-char		*find_command_path(char *command);
-void		close_pipe(int pipefd[2]);
-void		prepare_pipe(t_command *cmd, int pipefd[2], int prev_pipefd[2]);
-int			is_builtin(char *command);
-int			execute_builtin(char *command, char **argv, t_env **env_head);
+/*
+** expander.c
+*/
+void	expand(t_node *node, t_env *env_list);
 
-// builtin.c
-int			builtin_echo(char **argv);
-int			builtin_cd(char **argv);
-int			builtin_pwd(char **argv);
-int			builtin_exit(char **argv);
-int			builtin_export(char **argv, t_env **env_head);
-int			builtin_unset(char **argv, t_env **env_head);
-int			builtin_env(char **argv, t_env *env);
+/*
+** executor.c
+*/
+int		execute(t_node *node, t_env *env_list);
+int		handle_heredoc(t_redirect *redirect);
 
-// env.c
-char	**create_environ(t_env *env_head);
-t_env		*create_env_list(char **environ);
-void		print_env(t_env *env);
-t_env		*search_env(t_env *env, char *key);
-void	append_env(t_env **head, t_env *env);
+/*
+** builtin.c
+*/
+t_builtin_type	get_builtin_type(const char *cmd);
+int				execute_builtin(t_builtin_type type, char **argv,
+					t_env **env_list);
 
-// redirections.c
-int			handle_redirections(t_command *cmd);
-int			do_redirection(t_redirect *redir);
-int			open_redirection_file(char *filename, int flags);
-int			heredoc(char *delimiter);
-
-// expand.c
-void		expand_tokens(t_token *tokens, int last_status);
-char		*expand_variable(char *str, int last_status);
-char		*expand_special_parameter(char *str, int last_status);
-void		remove_quotes(char *str);
-char		*expand_wildcard(char *str);
-
-// signal.c
-void		setup_signal_handlers(void);
-void		handle_sigint(int sig);
-
-// main.c
-void	free_tokens(t_token *tokens);
-void	free_commands(t_command *cmds);
-void	free_env_list(t_env *env);
-
+/*
+** env.c
+*/
+t_env	*create_env_list(char **environ);
+char	*get_env_value(t_env *env_list, const char *name);
+int		set_env_value(t_env **env_list, const char *name,
+			const char *value);
+void	unset_env_value(t_env **env_list, const char *name);
+void	print_env_list(t_env *env_list);
+void	free_env_list(t_env *env_list);
+char	**env_to_envp(t_env *env_list);
 
 #endif

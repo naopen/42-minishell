@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 16:39:54 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/08/15 17:36:00 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ int	do_redirection(t_redirect *redir)
 	if (fd == -1)
 		return (-1);
 	if (dup2(fd, redir->fd) == -1)
-		fatal_error("dup2");
+		exit_with_error("dup2");
 	if (close(fd) == -1)
-		fatal_error("close");
+		exit_with_error("close");
 	return (0);
 }
 
@@ -70,7 +70,7 @@ int	heredoc(char *delimiter)
 	int		pfd[2];
 
 	if (pipe(pfd) == -1)
-		fatal_error("pipe");
+		exit_with_error("pipe");
 	while (1)
 	{
 		line = readline("> ");
@@ -85,6 +85,6 @@ int	heredoc(char *delimiter)
 		free(line);
 	}
 	if (close(pfd[1]) == -1)
-		fatal_error("close");
+		exit_with_error("close");
 	return (pfd[0]);
 }

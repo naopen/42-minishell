@@ -6,7 +6,7 @@
 #    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/08/09 20:51:50 by nkannan          ###   ########.fr        #
+#    Updated: 2024/08/15 16:53:46 by nkannan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,15 @@ SRC_DIR = src
 OBJ_DIR = obj
 INC_DIR = includes
 
-SRCS = main.c lexer.c parser.c executor.c builtin.c env.c redirections.c expand.c signal.c utils.c
+SRCS = main.c \
+       tokenizer.c \
+       parser.c \
+       expander.c \
+       executor.c \
+       builtin.c \
+       env.c \
+       utils.c
+
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 .PHONY: all clean fclean re
