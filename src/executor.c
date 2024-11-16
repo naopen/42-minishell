@@ -117,12 +117,18 @@ static char *find_executable(const char *cmd, t_env *env_list)
             
         exec_path = ft_strjoin(dir, "/");
         if (!exec_path)
+        {
+            free(path);
             return (NULL);
+        }
             
         tmp = ft_strjoin(exec_path, cmd);
         free(exec_path);
         if (!tmp)
+        {
+            free(path);
             return (NULL);
+        }
         exec_path = tmp;
         
         if (access(exec_path, X_OK) == 0)
@@ -132,9 +138,9 @@ static char *find_executable(const char *cmd, t_env *env_list)
         }
         free(exec_path);
         
-        if (!ft_strchr(dir, ':'))
+        if (tmp == NULL)
             break;
-        dir = ft_strchr(dir, ':') + 1;
+        dir = tmp + 1;
     }
     free(path);
     return (NULL);
