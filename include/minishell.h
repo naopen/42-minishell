@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 17:35:50 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 23:09:45 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,7 @@ void	free_ast(t_node *ast);
 ** expander.c
 */
 void	expand(t_node *node, t_env *env_list);
+char	*expand_env_var(char *str);
 
 /*
 ** executor.c
