@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 16:50:23 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:00:09 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char	*get_env_value(t_env *env_list, const char *name)
 {
 	while (env_list)
 	{
-		if (strcmp(env_list->name, name) == 0)
+		if (ft_strcmp(env_list->name, name) == 0)
 			return (env_list->value);
 		env_list = env_list->next;
 	}
@@ -54,7 +54,7 @@ int	set_env_value(t_env **env_list, const char *name, const char *value)
 	env = *env_list;
 	while (env)
 	{
-		if (strcmp(env->name, name) == 0)
+		if (ft_strcmp(env->name, name) == 0)
 		{
 			free(env->value);
 			env->value = ft_strdup(value);
@@ -89,7 +89,7 @@ void	unset_env_value(t_env **env_list, const char *name)
 	curr = *env_list;
 	while (curr)
 	{
-		if (strcmp(curr->name, name) == 0)
+		if (ft_strcmp(curr->name, name) == 0)
 		{
 			if (prev)
 				prev->next = curr->next;

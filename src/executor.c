@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:33:33 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:00:13 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ int	handle_heredoc(t_redirect *redirect)
 		while (1)
 		{
 			line = readline("> ");
-			if (line == NULL || strcmp(line, redirect->file_name) == 0)
+			if (line == NULL || ft_strcmp(line, redirect->file_name) == 0)
 				break ;
 			ft_putendl_fd(line, pipefd[1]);
 			free(line);
@@ -98,30 +98,30 @@ static char *find_executable(const char *cmd, t_env *env_list)
     char *dir;
     char *exec_path;
     char *tmp;
-    
+
     if (ft_strchr(cmd, '/'))
         return (ft_strdup(cmd));
-    
+
     path_env = get_env_value(env_list, "PATH");
     if (!path_env)
         return (NULL);
-    
+
     path = ft_strdup(path_env);
     dir = path;
-    
+
     while (dir && *dir)
     {
         tmp = ft_strchr(dir, ':');
         if (tmp)
             *tmp = '\0';
-            
+
         exec_path = ft_strjoin(dir, "/");
         if (!exec_path)
         {
             free(path);
             return (NULL);
         }
-            
+
         tmp = ft_strjoin(exec_path, cmd);
         free(exec_path);
         if (!tmp)
@@ -130,14 +130,14 @@ static char *find_executable(const char *cmd, t_env *env_list)
             return (NULL);
         }
         exec_path = tmp;
-        
+
         if (access(exec_path, X_OK) == 0)
         {
             free(path);
             return (exec_path);
         }
         free(exec_path);
-        
+
         if (!tmp || !ft_strchr(dir + ft_strlen(dir) + 1, ':'))
             break;
         dir = dir + ft_strlen(dir) + 1;

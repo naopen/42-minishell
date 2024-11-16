@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:11:04 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:00:16 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ static t_node	*parse_pipeline(t_token **token_list)
 	head = parse_command(token_list);
 	node = head;
 	while (*token_list && (*token_list)->type == TOKEN_OPERATOR
-		&& strcmp((*token_list)->word, "|") == 0)
+		&& ft_strcmp((*token_list)->word, "|") == 0)
 	{
 		*token_list = (*token_list)->next;
 		node->next = parse_command(token_list);

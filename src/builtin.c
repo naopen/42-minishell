@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:34:29 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 15:59:50 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static int	builtin_echo(char **argv)
 
 	newline = true;
 	i = 1;
-	if (argv[i] && strcmp(argv[i], "-n") == 0)
+	if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
 	{
 		newline = false;
 		i++;
@@ -135,19 +135,19 @@ static int	builtin_exit(char **argv)
 
 t_builtin_type	get_builtin_type(const char *cmd)
 {
-	if (strcmp(cmd, "echo") == 0)
+	if (ft_strcmp(cmd, "echo") == 0)
 		return (BUILTIN_ECHO);
-	if (strcmp(cmd, "cd") == 0)
+	if (ft_strcmp(cmd, "cd") == 0)
 		return (BUILTIN_CD);
-	if (strcmp(cmd, "pwd") == 0)
+	if (ft_strcmp(cmd, "pwd") == 0)
 		return (BUILTIN_PWD);
-	if (strcmp(cmd, "export") == 0)
+	if (ft_strcmp(cmd, "export") == 0)
 		return (BUILTIN_EXPORT);
-	if (strcmp(cmd, "unset") == 0)
+	if (ft_strcmp(cmd, "unset") == 0)
 		return (BUILTIN_UNSET);
-	if (strcmp(cmd, "env") == 0)
+	if (ft_strcmp(cmd, "env") == 0)
 		return (BUILTIN_ENV);
-	if (strcmp(cmd, "exit") == 0)
+	if (ft_strcmp(cmd, "exit") == 0)
 		return (BUILTIN_EXIT);
 	return (BUILTIN_UNKNOWN);
 }

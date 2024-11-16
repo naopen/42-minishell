@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:10:12 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:00:20 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 static t_token_type	get_token_type(const char *str)
 {
-	if (strcmp(str, "<") == 0)
+	if (ft_strcmp(str, "<") == 0)
 		return (TOKEN_REDIRECT_IN);
-	if (strcmp(str, ">") == 0)
+	if (ft_strcmp(str, ">") == 0)
 		return (TOKEN_REDIRECT_OUT);
-	if (strcmp(str, ">>") == 0)
+	if (ft_strcmp(str, ">>") == 0)
 		return (TOKEN_REDIRECT_APPEND);
-	if (strcmp(str, "<<") == 0)
+	if (ft_strcmp(str, "<<") == 0)
 		return (TOKEN_HEREDOC);
 	if (strchr(";|", *str))
 		return (TOKEN_OPERATOR);
