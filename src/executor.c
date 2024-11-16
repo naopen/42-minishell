@@ -160,11 +160,10 @@ static int	execute_external(char **argv, t_redirect *redirects,
 			exit_with_error("minishell: execve error");
 		}
 	}
-	free(exec_path);
-	else
-	{
-		ft_strarrdel(envp);
-		waitpid(pid, &status, 0);
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (1);
 		if (WIFEXITED(status))
 			return (WEXITSTATUS(status));
 		return (1);
