@@ -46,7 +46,7 @@ static char	**get_command_args(t_token **token_list)
 	token = *token_list;
 	while (token && token->type == TOKEN_WORD)
 	{
-		argv[argc++] = token->word;
+		argv[argc++] = expand_env_var(ft_strdup(token->word));
 		token = token->next;
 	}
 	argv[argc] = NULL;
