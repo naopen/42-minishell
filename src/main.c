@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:14:15 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 12:49:36 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	main(int argc, char **argv, char **environ)
 	status = EXIT_SUCCESS;
 	while (1)
 	{
-		line = readline("minishell$ ");
+		line = readline("minishell> ");
 		if (line == NULL)
 			break ;
 		if (*line != '\0')
