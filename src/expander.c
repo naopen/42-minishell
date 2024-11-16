@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:11:50 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:03:16 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static char	*expand_variable(char *str, t_env *env_list)
 		{
 			i++;
 			k = 0;
-			while (str[i + k] && (isalnum(str[i + k]) || str[i + k] == '_'))
+			while (str[i + k] && (ft_isalnum(str[i + k]) || str[i + k] == '_'))
 				k++;
 			var_name = ft_strndup(str + i, k);
 			if (var_name == NULL)
@@ -69,7 +69,7 @@ static char	*expand_double_quote(char *str)
 		if (str[i] == '$' && str[i + 1] != '\0' && str[i + 1] != '\"')
 		{
 			result[j++] = str[i++];
-			while (str[i] && (isalnum(str[i]) || str[i] == '_'))
+			while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 				result[j++] = str[i++];
 		}
 		else
