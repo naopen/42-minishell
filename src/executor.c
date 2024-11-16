@@ -207,30 +207,43 @@ static int	execute_pipeline(t_node *node, t_env *env_list)
 	int		pipefd[2];
 	pid_t	pid;
 	int		status;
+	int		stdin_backup;
 
 	if (node->next == NULL)
 		return (execute_command(node, env_list));
+
+	stdin_backup = dup(STDIN_FILENO);
 	if (pipe(pipefd) == -1)
 		exit_with_error("minishell: pipe error");
+
 	pid = fork();
 	if (pid == -1)
 		exit_with_error("minishell: fork error");
+
 	if (pid == 0)
 	{
 		close(pipefd[0]);
-		dup2(pipefd[1], STDOUT_FILENO);
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+			exit_with_error("minishell: dup2 error");
 		close(pipefd[1]);
 		exit(execute_command(node, env_list));
 	}
-	else
-	{
-		close(pipefd[1]);
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-		status = execute_pipeline(node->next, env_list);
-		waitpid(pid, NULL, 0);
-		return (status);
-	}
+
+	close(pipefd[1]);
+	if (dup2(pipefd[0], STDIN_FILENO) == -1)
+		exit_with_error("minishell: dup2 error");
+	close(pipefd[0]);
+
+	status = execute_pipeline(node->next, env_list);
+	waitpid(pid, &status, 0);
+
+	if (dup2(stdin_backup, STDIN_FILENO) == -1)
+		exit_with_error("minishell: dup2 error");
+	close(stdin_backup);
+
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (1);
 }
 
 int	execute(t_node *node, t_env *env_list)
