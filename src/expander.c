@@ -179,12 +179,25 @@ char	*expand_env_var(char *str)
 			env_name = get_env_name(str + i);
 			env_value = getenv(env_name);
 			if (env_value)
-				result = ft_strjoin_free(result, env_value);
+			{
+				char *tmp = ft_strjoin(result, env_value);
+				free(result);
+				result = tmp;
+			}
 			i += ft_strlen(env_name);
 			free(env_name);
 		}
 		else
-			result = ft_strjoin_char_free(result, str[i++]);
+		{
+			char *tmp = malloc(ft_strlen(result) + 2);
+			if (!tmp)
+				exit_with_error("minishell: malloc error");
+			ft_strlcpy(tmp, result, ft_strlen(result) + 1);
+			tmp[ft_strlen(result)] = str[i++];
+			tmp[ft_strlen(result) + 1] = '\0';
+			free(result);
+			result = tmp;
+		}
 	}
 	free(str);
 	return (result);
