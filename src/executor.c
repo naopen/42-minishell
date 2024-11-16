@@ -168,8 +168,6 @@ static int	execute_external(char **argv, t_redirect *redirects,
 			return (WEXITSTATUS(status));
 		return (1);
 	}
-	return (1);
-}
 
 static int	execute_command(t_node *node, t_env *env_list)
 {
