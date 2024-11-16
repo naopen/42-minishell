@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 23:09:45 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 23:19:47 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,9 +96,7 @@ typedef enum e_builtin_type
 	BUILTIN_UNKNOWN,
 }	t_builtin_type;
 
-/*
-** utils.c
-*/
+// utils.c
 void	exit_with_error(const char *msg);
 bool	ft_isnumber(const char *str);
 char	*ft_strndup(const char *s1, size_t n);
@@ -107,41 +105,29 @@ void	ft_strarrdel(char **arr);
 int		ft_strarrlen(char **arr);
 char	**ft_strarradd(char **arr, char *str);
 
-/*
-** tokenizer.c
-*/
+// tokenizer.c
 t_token	*tokenize(char *line);
 void	free_token_list(t_token *token_list);
 bool	is_quote(char c);
 
-/*
-** parser.c
-*/
+// parser.c
 t_node	*parse(t_token **token_list);
 void	free_ast(t_node *ast);
 
-/*
-** expander.c
-*/
+// expander.c
 void	expand(t_node *node, t_env *env_list);
 char	*expand_env_var(char *str);
 
-/*
-** executor.c
-*/
+// executor.c
 int		execute(t_node *node, t_env *env_list);
 int		handle_heredoc(t_redirect *redirect);
 
-/*
-** builtin.c
-*/
+// builtin.c
 t_builtin_type	get_builtin_type(const char *cmd);
 int				execute_builtin(t_builtin_type type, char **argv,
 					t_env **env_list);
 
-/*
-** env.c
-*/
+// env.c
 t_env	*create_env_list(char **environ);
 char	*get_env_value(t_env *env_list, const char *name);
 int		set_env_value(t_env **env_list, const char *name,
