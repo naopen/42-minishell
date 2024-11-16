@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 16:03:16 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 23:09:39 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,4 +139,66 @@ void	expand(t_node *node, t_env *env_list)
 	expand_argv(node->argv, env_list);
 	expand_redirects(node->redirects, env_list);
 	expand(node->next, env_list);
+}
+
+static char	*get_env_name(const char *str)
+{
+	int		i;
+	char	*name;
+
+	i = 0;
+	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
+		i++;
+	name = ft_strndup(str, i);
+	if (!name)
+		exit_with_error("minishell: malloc error");
+	return (name);
+}
+
+char	*expand_env_var(char *str)
+{
+	char	*result;
+	char	*env_name;
+	char	*env_value;
+	int		i;
+	int		in_single_quote;
+
+	result = ft_strdup("");
+	if (!result)
+		exit_with_error("minishell: malloc error");
+	i = 0;
+	in_single_quote = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'')
+			in_single_quote = !in_single_quote;
+		if (str[i] == '$' && !in_single_quote && str[i + 1] &&
+			(ft_isalnum(str[i + 1]) || str[i + 1] == '_'))
+		{
+			i++;
+			env_name = get_env_name(str + i);
+			env_value = getenv(env_name);
+			if (env_value)
+			{
+				char *tmp = ft_strjoin(result, env_value);
+				free(result);
+				result = tmp;
+			}
+			i += ft_strlen(env_name);
+			free(env_name);
+		}
+		else
+		{
+			char *tmp = malloc(ft_strlen(result) + 2);
+			if (!tmp)
+				exit_with_error("minishell: malloc error");
+			ft_strlcpy(tmp, result, ft_strlen(result) + 1);
+			tmp[ft_strlen(result)] = str[i++];
+			tmp[ft_strlen(result) + 1] = '\0';
+			free(result);
+			result = tmp;
+		}
+	}
+	free(str);
+	return (result);
 }
