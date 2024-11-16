@@ -1,6 +1,7 @@
 # Project specific
 minishell
 minishell_tester/
+mpanic/
 export.py
 repository_contents.txt
 
