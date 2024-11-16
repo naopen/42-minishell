@@ -138,9 +138,9 @@ static char *find_executable(const char *cmd, t_env *env_list)
         }
         free(exec_path);
         
-        if (tmp == NULL)
+        if (!tmp || !ft_strchr(dir + ft_strlen(dir) + 1, ':'))
             break;
-        dir = tmp + 1;
+        dir = dir + ft_strlen(dir) + 1;
     }
     free(path);
     return (NULL);
