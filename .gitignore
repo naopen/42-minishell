@@ -1,6 +1,7 @@
 # Project specific
 minishell
 minishell_tester/
+mpanic/
 export.py
 repository_contents.txt
 
@@ -50,3 +51,5 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+.aider*
+.env

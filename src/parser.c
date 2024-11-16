@@ -6,131 +6,156 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/08 17:08:25 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:00:16 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-t_command	*new_command(void)
+static t_node	*new_node(t_node_type type)
 {
-	t_command	*cmd;
+	t_node	*node;
 
-	cmd = (t_command *)malloc(sizeof(t_command));
-	if (cmd == NULL)
-		fatal_error("malloc");
-	cmd->argv = NULL;
-	cmd->redirects = NULL;
-	cmd->next = NULL;
-	return (cmd);
+	node = (t_node *)malloc(sizeof(t_node));
+	if (node == NULL)
+		exit_with_error("minishell: malloc error");
+	node->type = type;
+	node->argv = NULL;
+	node->redirects = NULL;
+	node->next = NULL;
+	return (node);
 }
 
-t_redirect	*new_redirect(t_token *tokens)
+static char	**get_command_args(t_token **token_list)
 {
-	t_redirect	*redir;
+	int		argc;
+	char	**argv;
+	t_token	*token;
 
-	redir = (t_redirect *)malloc(sizeof(t_redirect));
-	if (redir == NULL)
-		fatal_error("malloc");
-	if (tokens->str[0] == '>')
+	argc = 0;
+	token = *token_list;
+	while (token && token->type == TOKEN_WORD)
 	{
-		if (tokens->str[1] == '>')
-			redir->type = REDIR_APPEND;
-		else
-			redir->type = REDIR_OUTPUT;
-		redir->fd = 1;
+		argc++;
+		token = token->next;
 	}
-	else if (tokens->str[0] == '<')
+	argv = (char **)malloc(sizeof(char *) * (argc + 1));
+	if (argv == NULL)
+		exit_with_error("minishell: malloc error");
+	argc = 0;
+	token = *token_list;
+	while (token && token->type == TOKEN_WORD)
 	{
-		if (tokens->str[1] == '<')
-			redir->type = REDIR_HEREDOC;
-		else
-			redir->type = REDIR_INPUT;
-		redir->fd = 0;
+		argv[argc++] = token->word;
+		token = token->next;
 	}
-	tokens = tokens->next;
-	redir->filename = ft_strdup(tokens->str);
-	if (redir->filename == NULL)
-		fatal_error("malloc");
-	redir->next = NULL;
-	return (redir);
+	argv[argc] = NULL;
+	*token_list = token;
+	return (argv);
 }
 
-void	append_tok(t_token **tokens, t_token *tok)
+static t_redirect	*parse_redirect(t_token **token_list)
 {
-	t_token	*tmp;
+	t_redirect	*redirect;
 
-	if (*tokens == NULL)
+	redirect = (t_redirect *)malloc(sizeof(t_redirect));
+	if (redirect == NULL)
+		exit_with_error("minishell: malloc error");
+	if ((*token_list)->type == TOKEN_REDIRECT_IN)
+		redirect->type = REDIRECT_IN;
+	else if ((*token_list)->type == TOKEN_REDIRECT_OUT)
+		redirect->type = REDIRECT_OUT;
+	else if ((*token_list)->type == TOKEN_REDIRECT_APPEND)
+		redirect->type = REDIRECT_APPEND;
+	else if ((*token_list)->type == TOKEN_HEREDOC)
 	{
-		*tokens = tok;
-		return ;
+		redirect->type = REDIRECT_HEREDOC;
+		*token_list = (*token_list)->next;
+		if (*token_list == NULL || (*token_list)->type != TOKEN_WORD)
+			exit_with_error("minishell: syntax error: heredoc delimiter not found");
+		redirect->file_name = (*token_list)->word;
 	}
-	tmp = *tokens;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = tok;
+	else
+		exit_with_error("minishell: syntax error: invalid redirect");
+	*token_list = (*token_list)->next;
+	return (redirect);
 }
 
-void	append_redirect(t_redirect **redirects, t_redirect *redir)
+static void	add_redirect_to_list(t_redirect **head, t_redirect *redirect)
 {
 	t_redirect	*tmp;
 
-	if (*redirects == NULL)
+	if (*head == NULL)
+		*head = redirect;
+	else
 	{
-		*redirects = redir;
-		return ;
+		tmp = *head;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = redirect;
 	}
-	tmp = *redirects;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = redir;
 }
 
-t_command	*parse(t_token *tokens)
+static t_node	*parse_command(t_token **token_list)
 {
-	t_command	*head;
-	t_command	*cmd;
-	t_token		*tok;
-	int			argc;
+	t_node		*command;
+	t_redirect	*redirect_head;
+	t_redirect	*redirect;
 
-	head = NULL;
-	cmd = NULL;
-	while (tokens->kind != TK_EOF)
+	command = new_node(NODE_COMMAND);
+	command->argv = get_command_args(token_list);
+	redirect_head = NULL;
+	while (*token_list && ((*token_list)->type == TOKEN_REDIRECT_IN
+			|| (*token_list)->type == TOKEN_REDIRECT_OUT
+			|| (*token_list)->type == TOKEN_REDIRECT_APPEND
+			|| (*token_list)->type == TOKEN_HEREDOC))
 	{
-		if (head == NULL)
-		{
-			head = new_command();
-			cmd = head;
-		}
-		else
-		{
-			cmd->next = new_command();
-			cmd = cmd->next;
-		}
-		argc = 0;
-		tok = tokens;
-		while (tok->kind != TK_EOF && tok->kind != TK_PIPE)
-		{
-			if (tok->kind == TK_WORD)
-				argc++;
-			tok = tok->next;
-		}
-		cmd->argv = (char **)malloc(sizeof(char *) * (argc + 1));
-		if (cmd->argv == NULL)
-			fatal_error("malloc");
-		argc = 0;
-		while (tokens->kind != TK_EOF && tokens->kind != TK_PIPE)
-		{
-			if (tokens->kind == TK_WORD)
-				cmd->argv[argc++] = ft_strdup(tokens->str);
-			else if (tokens->kind == TK_REDIR_OUTPUT || tokens->kind == TK_REDIR_APPEND
-					|| tokens->kind == TK_REDIR_INPUT || tokens->kind == TK_REDIR_HEREDOC)
-				append_redirect(&cmd->redirects, new_redirect(tokens));
-			tokens = tokens->next;
-		}
-		cmd->argv[argc] = NULL;
-		if (tokens->kind == TK_PIPE)
-			tokens = tokens->next;
+		redirect = parse_redirect(token_list);
+		add_redirect_to_list(&redirect_head, redirect);
+	}
+	command->redirects = redirect_head;
+	return (command);
+}
+
+static t_node	*parse_pipeline(t_token **token_list)
+{
+	t_node	*head;
+	t_node	*node;
+
+	head = parse_command(token_list);
+	node = head;
+	while (*token_list && (*token_list)->type == TOKEN_OPERATOR
+		&& ft_strcmp((*token_list)->word, "|") == 0)
+	{
+		*token_list = (*token_list)->next;
+		node->next = parse_command(token_list);
+		node = node->next;
 	}
 	return (head);
+}
+
+t_node	*parse(t_token **token_list)
+{
+	return (parse_pipeline(token_list));
+}
+
+void	free_ast(t_node *ast)
+{
+	t_node		*tmp_node;
+	t_redirect	*tmp_redirect;
+
+	while (ast)
+	{
+		tmp_node = ast->next;
+		ft_strarrdel(ast->argv);
+		while (ast->redirects)
+		{
+			tmp_redirect = ast->redirects->next;
+			free(ast->redirects->file_name);
+			free(ast->redirects);
+			ast->redirects = tmp_redirect;
+		}
+		free(ast);
+		ast = tmp_node;
+	}
 }

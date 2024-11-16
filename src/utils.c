@@ -6,16 +6,29 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 23:33:21 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 17:39:54 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	fatal_error(const char *msg)
+void	exit_with_error(const char *msg)
 {
 	perror(msg);
 	exit(EXIT_FAILURE);
+}
+
+bool	ft_isnumber(const char *str)
+{
+	if (*str == '-' || *str == '+')
+		str++;
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (false);
+		str++;
+	}
+	return (true);
 }
 
 char	*ft_strndup(const char *s, size_t n)
@@ -30,7 +43,7 @@ char	*ft_strndup(const char *s, size_t n)
 		i++;
 	str = (char *)malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
-		fatal_error("malloc");
+		exit_with_error("malloc");
 	ft_strlcpy(str, s, i + 1);
 	return (str);
 }
@@ -48,7 +61,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		len = ft_strlen(s) - (size_t)start;
 	substr = (char *)malloc(sizeof(char) * (len + 1));
 	if (substr == NULL)
-		fatal_error("malloc");
+		exit_with_error("malloc");
 	i = 0;
 	while (i < len)
 	{
@@ -59,9 +72,61 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (substr);
 }
 
-char	*ft_strdup(const char *s)
+void	ft_strdel(char **as)
 {
-	return (ft_strndup(s, ft_strlen(s)));
+	if (as && *as)
+	{
+		free(*as);
+		*as = NULL;
+	}
+}
+
+void	ft_strarrdel(char **arr)
+{
+	int	i;
+
+	if (arr)
+	{
+		i = 0;
+		while (arr[i])
+		{
+			ft_strdel(&arr[i]);
+			i++;
+		}
+		free(arr);
+	}
+}
+
+int	ft_strarrlen(char **arr)
+{
+	int	len;
+
+	len = 0;
+	while (arr && arr[len])
+		len++;
+	return (len);
+}
+
+char	**ft_strarradd(char **arr, char *str)
+{
+	char	**new_arr;
+	int		len;
+	int		i;
+
+	len = ft_strarrlen(arr);
+	new_arr = (char **)malloc(sizeof(char *) * (len + 2));
+	if (new_arr == NULL)
+		exit_with_error("minishell: malloc error");
+	i = 0;
+	while (i < len)
+	{
+		new_arr[i] = arr[i];
+		i++;
+	}
+	new_arr[i] = str;
+	new_arr[i + 1] = NULL;
+	free(arr);
+	return (new_arr);
 }
 
 char	*ft_strjoin_char_free(char *s1, char s2)
@@ -70,7 +135,7 @@ char	*ft_strjoin_char_free(char *s1, char s2)
 
 	new_str = ft_strjoin(s1, &s2);
 	if (new_str == NULL)
-		fatal_error("malloc");
+		exit_with_error("malloc");
 	free(s1);
 	return (new_str);
 }
@@ -81,7 +146,7 @@ char	*ft_strjoin_free(char *s1, char *s2)
 
 	new_str = ft_strjoin(s1, s2);
 	if (new_str == NULL)
-		fatal_error("malloc");
+		exit_with_error("malloc");
 	free(s1);
 	free(s2);
 	return (new_str);
@@ -93,7 +158,7 @@ char	*ft_strjoin_space_free(char *s1, char *s2)
 
 	new_str = ft_strjoin(s1, " ");
 	if (new_str == NULL)
-		fatal_error("malloc");
+		exit_with_error("malloc");
 	new_str = ft_strjoin_free(new_str, s2);
 	return (new_str);
 }
@@ -141,37 +206,19 @@ char	*ft_strtok(char *str, const char *delim)
 }
 
 
-int	ft_fnmatch(const char *pattern, const char *string, int flags)
-{
-	(void)flags;
-	if (*pattern == '*' && *(pattern + 1) == '\0')
-		return (0);
-	if (*pattern == '\0' && *string == '\0')
-		return (0);
-	if (*pattern == '*' && *(pattern + 1) != '\0' && *string == '\0')
-		return (FNM_NOMATCH);
-	if (*pattern == *string)
-		return (ft_fnmatch(pattern + 1, string + 1, flags));
-	if (*pattern == '*')
-		return (ft_fnmatch(pattern + 1, string, flags)
-			|| ft_fnmatch(pattern, string + 1, flags));
-	return (FNM_NOMATCH);
-}
-
-// exportの識別子として有効かどうかを判定する関数
-bool	is_valid_identifier(char *str)
-{
-	size_t	i;
-
-	i = 0;
-	if (!ft_isalpha(str[i]) && str[i] != '_')
-		return (false);
-	i++;
-	while (str[i] && str[i] != '=')
-	{
-		if (!ft_isalnum(str[i]) && str[i] != '_')
-			return (false);
-		i++;
-	}
-	return (true);
-}
+// int	ft_fnmatch(const char *pattern, const char *string, int flags)
+// {
+// 	(void)flags;
+// 	if (*pattern == '*' && *(pattern + 1) == '\0')
+// 		return (0);
+// 	if (*pattern == '\0' && *string == '\0')
+// 		return (0);
+// 	if (*pattern == '*' && *(pattern + 1) != '\0' && *string == '\0')
+// 		return (FNM_NOMATCH);
+// 	if (*pattern == *string)
+// 		return (ft_fnmatch(pattern + 1, string + 1, flags));
+// 	if (*pattern == '*')
+// 		return (ft_fnmatch(pattern + 1, string, flags)
+// 			|| ft_fnmatch(pattern, string + 1, flags));
+// 	return (FNM_NOMATCH);
+// }

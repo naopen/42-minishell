@@ -6,172 +6,253 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/12 01:26:13 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 17:38:20 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	execute_pipeline(t_command *cmd, t_env **env_head)
+static int	do_redirection(t_redirect *redirect)
+{
+	int	fd;
+
+	while (redirect)
+	{
+		if (redirect->type == REDIRECT_IN)
+		{
+			fd = open(redirect->file_name, O_RDONLY);
+			if (fd == -1)
+				exit_with_error("minishell: open error");
+			if (dup2(fd, STDIN_FILENO) == -1)
+				exit_with_error("minishell: dup2 error");
+			close(fd);
+		}
+		else if (redirect->type == REDIRECT_OUT)
+		{
+			fd = open(redirect->file_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (fd == -1)
+				exit_with_error("minishell: open error");
+			if (dup2(fd, STDOUT_FILENO) == -1)
+				exit_with_error("minishell: dup2 error");
+			close(fd);
+		}
+		else if (redirect->type == REDIRECT_APPEND)
+		{
+			fd = open(redirect->file_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (fd == -1)
+				exit_with_error("minishell: open error");
+			if (dup2(fd, STDOUT_FILENO) == -1)
+				exit_with_error("minishell: dup2 error");
+			close(fd);
+		}
+		else if (redirect->type == REDIRECT_HEREDOC)
+			handle_heredoc(redirect);
+		redirect = redirect->next;
+	}
+	return (0);
+}
+
+int	handle_heredoc(t_redirect *redirect)
 {
 	int		pipefd[2];
-	int		prev_pipefd[2];
 	pid_t	pid;
-	int		wait_status;
-	int		exit_code;
+	int		status;
+	char	*line;
 
-	prev_pipefd[0] = -1;
-	prev_pipefd[1] = -1;
-	exit_code = 0;
-	while (cmd)
-	{
-		if (cmd->next && pipe(pipefd) == -1)
-			fatal_error("pipe");
-		pid = execute_command(cmd, pipefd, prev_pipefd, env_head);
-		close_pipe(pipefd); // パイプを閉じる
-		if (prev_pipefd[0] != -1)
-			close_pipe(prev_pipefd); // 前のパイプを閉じる
-		if (waitpid(pid, &wait_status, 0) == -1)
-			fatal_error("waitpid");
-		if (WIFEXITED(wait_status))
-			exit_code = WEXITSTATUS(wait_status);
-		else if (WIFSIGNALED(wait_status))
-			exit_code = 128 + WTERMSIG(wait_status);
-		prev_pipefd[0] = pipefd[0];
-		prev_pipefd[1] = pipefd[1];
-		cmd = cmd->next;
-	}
-	return (exit_code);
-}
-
-pid_t	execute_command(t_command *cmd, int pipefd[2], int prev_pipefd[2],
-		t_env **env_head)
-{
-	pid_t	pid;
-	char	*path;
-	int		stdin_copy;
-	int		stdout_copy;
-	int		wait_status;
-
-	stdin_copy = dup(STDIN_FILENO);
-	stdout_copy = dup(STDOUT_FILENO);
-	if (stdin_copy == -1 || stdout_copy == -1)
-		fatal_error("dup");
+	if (pipe(pipefd) == -1)
+		exit_with_error("minishell: pipe error");
 	pid = fork();
-	if (pid < 0)
-		fatal_error("fork");
-	else if (pid == 0)
+	if (pid == -1)
+		exit_with_error("minishell: fork error");
+	if (pid == 0)
 	{
-		prepare_pipe(cmd, pipefd, prev_pipefd);
-		if (handle_redirections(cmd) == -1)
-			exit(EXIT_FAILURE);
-		if (is_builtin(cmd->argv[0]))
-			exit(execute_builtin(cmd->argv[0], cmd->argv, env_head));
-		path = find_command_path(cmd->argv[0]);
-		if (path == NULL)
+		close(pipefd[0]);
+		while (1)
 		{
-			printf("minishell: command not found: %s\n", cmd->argv[0]);
-			exit(127);
+			line = readline("> ");
+			if (line == NULL || ft_strcmp(line, redirect->file_name) == 0)
+				break ;
+			ft_putendl_fd(line, pipefd[1]);
+			free(line);
 		}
-		if (execve(path, cmd->argv, create_environ(*env_head)) == -1)
-			fatal_error("execve");
-	}
-	if (waitpid(pid, &wait_status, 0) == -1) // 子プロセスの終了を待つ
-		fatal_error("waitpid");
-	if (dup2(stdin_copy, STDIN_FILENO) == -1)
-		fatal_error("dup2");
-	if (dup2(stdout_copy, STDOUT_FILENO) == -1)
-		fatal_error("dup2");
-	if (close(stdin_copy) == -1)
-		fatal_error("close");
-	if (close(stdout_copy) == -1)
-		fatal_error("close");
-	return (pid);
-}
-
-char	*find_command_path(char *command)
-{
-	char	*path_env;
-	char	*path;
-	char	*dir;
-	size_t	len;
-	char	*full_path;
-
-	path_env = getenv("PATH");
-	if (path_env == NULL)
-		return (NULL);
-	path = ft_strdup(path_env);
-	if (path == NULL)
-		fatal_error("malloc");
-	dir = ft_strtok(path, ":");
-	while (dir != NULL)
-	{
-		len = ft_strlen(dir) + ft_strlen(command) + 2;
-		full_path = malloc(len);
-		if (full_path == NULL)
-			fatal_error("malloc");
-		ft_strlcpy(full_path, dir, len);
-		ft_strlcat(full_path, "/", len);
-		ft_strlcat(full_path, command, len);
-		if (access(full_path, X_OK) == 0)
-		{
-			free(path);
-			return (full_path);
-		}
-		free(full_path);
-		dir = ft_strtok(NULL, ":");
-	}
-	free(path);
-	return (NULL);
-}
-
-void	close_pipe(int pipefd[2])
-{
-	if (close(pipefd[0]) == -1)
-		fatal_error("close");
-	if (close(pipefd[1]) == -1)
-		fatal_error("close");
-}
-
-void	prepare_pipe(t_command *cmd, int pipefd[2], int prev_pipefd[2])
-{
-	if (cmd->next)
-	{
-		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
-			fatal_error("dup2");
 		close(pipefd[1]);
+		exit(0);
 	}
-	if (prev_pipefd[0] != -1)
+	else
 	{
-		if (dup2(prev_pipefd[0], STDIN_FILENO) == -1)
-			fatal_error("dup2");
-		close_pipe(prev_pipefd);
+		close(pipefd[1]);
+		dup2(pipefd[0], STDIN_FILENO);
+		close(pipefd[0]);
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+		else
+			return (1);
 	}
 }
 
-int	is_builtin(char *command)
+static char *find_executable(const char *cmd, t_env *env_list)
 {
-	return (ft_strcmp(command, "echo") == 0 || ft_strcmp(command, "cd") == 0 ||
-			ft_strcmp(command, "pwd") == 0 || ft_strcmp(command, "exit") == 0
-				|| ft_strcmp(command, "export") == 0 || ft_strcmp(command,
-					"unset") == 0 || ft_strcmp(command, "env") == 0);
+    char *path_env;
+    char *path;
+    char *dir;
+    char *exec_path;
+    char *tmp;
+
+    if (ft_strchr(cmd, '/'))
+        return (ft_strdup(cmd));
+
+    path_env = get_env_value(env_list, "PATH");
+    if (!path_env)
+        return (NULL);
+
+    path = ft_strdup(path_env);
+    dir = path;
+
+    while (dir && *dir)
+    {
+        tmp = ft_strchr(dir, ':');
+        if (tmp)
+            *tmp = '\0';
+
+        exec_path = ft_strjoin(dir, "/");
+        if (!exec_path)
+        {
+            free(path);
+            return (NULL);
+        }
+
+        tmp = ft_strjoin(exec_path, cmd);
+        free(exec_path);
+        if (!tmp)
+        {
+            free(path);
+            return (NULL);
+        }
+        exec_path = tmp;
+
+        if (access(exec_path, X_OK) == 0)
+        {
+            free(path);
+            return (exec_path);
+        }
+        free(exec_path);
+
+        if (!tmp || !ft_strchr(dir + ft_strlen(dir) + 1, ':'))
+            break;
+        dir = dir + ft_strlen(dir) + 1;
+    }
+    free(path);
+    return (NULL);
 }
 
-int	execute_builtin(char *command, char **argv, t_env **env_head)
+static int	execute_external(char **argv, t_redirect *redirects,
+		t_env *env_list)
 {
-	if (ft_strcmp(command, "echo") == 0)
-		return (builtin_echo(argv));
-	else if (ft_strcmp(command, "cd") == 0)
-		return (builtin_cd(argv));
-	else if (ft_strcmp(command, "pwd") == 0)
-		return (builtin_pwd(argv));
-	else if (ft_strcmp(command, "exit") == 0)
-		return (builtin_exit(argv));
-	else if (ft_strcmp(command, "export") == 0)
-		return (builtin_export(argv, env_head));
-	else if (ft_strcmp(command, "unset") == 0)
-		return (builtin_unset(argv, env_head));
-	else if (ft_strcmp(command, "env") == 0)
-		return (builtin_env(argv, *env_head));
+	pid_t	pid;
+	int		status;
+	char	**envp;
+	char    *exec_path;
+
+	envp = NULL;
+	exec_path = find_executable(argv[0], env_list);
+	if (!exec_path)
+	{
+		fprintf(stderr, "minishell: command not found: %s\n", argv[0]);
+		return (127);
+	}
+
+	pid = fork();
+	if (pid == -1)
+		exit_with_error("minishell: fork error");
+	if (pid == 0)
+	{
+		envp = env_to_envp(env_list);
+		if (do_redirection(redirects) == 1)
+		{
+			ft_strarrdel(envp);
+			free(exec_path);
+			exit(1);
+		}
+		if (execve(exec_path, argv, envp) == -1)
+		{
+			ft_strarrdel(envp);
+			free(exec_path);
+			exit_with_error("minishell: execve error");
+		}
+	}
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
 	return (1);
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+		return (1);
+	}
+
+static int	execute_command(t_node *node, t_env *env_list)
+{
+	t_builtin_type	builtin_type;
+
+	if (node == NULL)
+		return (0);
+	builtin_type = get_builtin_type(node->argv[0]);
+	if (builtin_type != BUILTIN_UNKNOWN)
+		return (execute_builtin(builtin_type, node->argv, &env_list));
+	return (execute_external(node->argv, node->redirects, env_list));
+}
+
+static int	execute_pipeline(t_node *node, t_env *env_list)
+{
+	int		pipefd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+	int		status;
+
+	if (node->next == NULL)
+		return (execute_command(node, env_list));
+
+	if (pipe(pipefd) == -1)
+		exit_with_error("minishell: pipe error");
+
+	pid1 = fork();
+	if (pid1 == -1)
+		exit_with_error("minishell: fork error");
+
+	if (pid1 == 0)
+	{
+		close(pipefd[0]);
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+			exit_with_error("minishell: dup2 error");
+		close(pipefd[1]);
+		exit(execute_command(node, env_list));
+	}
+
+	pid2 = fork();
+	if (pid2 == -1)
+		exit_with_error("minishell: fork error");
+
+	if (pid2 == 0)
+	{
+		close(pipefd[1]);
+		if (dup2(pipefd[0], STDIN_FILENO) == -1)
+			exit_with_error("minishell: dup2 error");
+		close(pipefd[0]);
+		exit(execute_pipeline(node->next, env_list));
+	}
+
+	close(pipefd[0]);
+	close(pipefd[1]);
+
+	waitpid(pid1, &status, 0);
+	waitpid(pid2, &status, 0);
+
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (1);
+}
+
+int	execute(t_node *node, t_env *env_list)
+{
+	return (execute_pipeline(node, env_list));
 }

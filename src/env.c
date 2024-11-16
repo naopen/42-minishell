@@ -6,100 +6,153 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/11 17:08:04 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 16:00:09 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-char	**create_environ(t_env *env_head)
-{
-	int		i;
-	t_env	*env;
-	char	**environ;
-
-	i = 0;
-	env = env_head;
-	while (env)
-	{
-		env = env->next;
-		i++;
-	}
-	environ = (char **)malloc(sizeof(char *) * (i + 1));
-	if (environ == NULL)
-		fatal_error("malloc");
-	i = 0;
-	env = env_head;
-	while (env)
-	{
-		environ[i] = ft_strjoin(env->key, "=");
-		if (environ[i] == NULL)
-			fatal_error("malloc");
-		environ[i] = ft_strjoin_free(environ[i], env->value);
-		env = env->next;
-		i++;
-	}
-	environ[i] = NULL;
-	return (environ);
-}
-
 t_env	*create_env_list(char **environ)
 {
 	t_env	*head;
 	t_env	*env;
-	int		i;
+	char	*name;
+	char	*value;
 
 	head = NULL;
-	i = 0;
-	while (environ[i])
+	while (*environ)
 	{
+		name = ft_strndup(*environ, ft_strchr(*environ, '=') - *environ);
+		value = ft_strdup(ft_strchr(*environ, '=') + 1);
 		env = (t_env *)malloc(sizeof(t_env));
 		if (env == NULL)
-			fatal_error("malloc");
-		env->key = ft_strndup(environ[i], ft_strchr(environ[i], '=') - environ[i]);
-		if (env->key == NULL)
-			fatal_error("malloc");
-		env->value = ft_strdup(ft_strchr(environ[i], '=') + 1);
-		if (env->value == NULL)
-			fatal_error("malloc");
-		env->next = NULL;
-		append_env(&head, env);
-		i++;
+			exit_with_error("minishell: malloc error");
+		env->name = name;
+		env->value = value;
+		env->next = head;
+		head = env;
+		environ++;
 	}
 	return (head);
 }
 
-void	print_env(t_env *env)
+char	*get_env_value(t_env *env_list, const char *name)
 {
-	while (env)
+	while (env_list)
 	{
-		printf("%s=%s\n", env->key, env->value);
-		env = env->next;
-	}
-}
-
-t_env	*search_env(t_env *env, char *key)
-{
-	while (env)
-	{
-		if (ft_strcmp(env->key, key) == 0)
-			return (env);
-		env = env->next;
+		if (ft_strcmp(env_list->name, name) == 0)
+			return (env_list->value);
+		env_list = env_list->next;
 	}
 	return (NULL);
 }
 
-void	append_env(t_env **head, t_env *env)
+int	set_env_value(t_env **env_list, const char *name, const char *value)
+{
+	t_env	*env;
+
+	env = *env_list;
+	while (env)
+	{
+		if (ft_strcmp(env->name, name) == 0)
+		{
+			free(env->value);
+			env->value = ft_strdup(value);
+			if (env->value == NULL)
+				exit_with_error("minishell: malloc error");
+			return (0);
+		}
+		env = env->next;
+	}
+	env = (t_env *)malloc(sizeof(t_env));
+	if (env == NULL)
+		exit_with_error("minishell: malloc error");
+	env->name = ft_strdup(name);
+	env->value = ft_strdup(value);
+	if (env->name == NULL || env->value == NULL)
+	{
+		free(env->name);
+		free(env->value);
+		exit_with_error("minishell: malloc error");
+	}
+	env->next = *env_list;
+	*env_list = env;
+	return (0);
+}
+
+void	unset_env_value(t_env **env_list, const char *name)
+{
+	t_env	*prev;
+	t_env	*curr;
+
+	prev = NULL;
+	curr = *env_list;
+	while (curr)
+	{
+		if (ft_strcmp(curr->name, name) == 0)
+		{
+			if (prev)
+				prev->next = curr->next;
+			else
+				*env_list = curr->next;
+			free(curr->name);
+			free(curr->value);
+			free(curr);
+			return ;
+		}
+		prev = curr;
+		curr = curr->next;
+	}
+}
+
+void	print_env_list(t_env *env_list)
+{
+	while (env_list)
+	{
+		printf("%s=%s\n", env_list->name, env_list->value);
+		env_list = env_list->next;
+	}
+}
+
+void	free_env_list(t_env *env_list)
 {
 	t_env	*tmp;
 
-	if (*head == NULL)
+	while (env_list)
 	{
-		*head = env;
-		return ;
+		tmp = env_list->next;
+		free(env_list->name);
+		free(env_list->value);
+		free(env_list);
+		env_list = tmp;
 	}
-	tmp = *head;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = env;
+}
+
+char	**env_to_envp(t_env *env_list)
+{
+	char	**envp;
+	t_env	*env;
+	int		i;
+
+	i = 0;
+	env = env_list;
+	while (env)
+	{
+		i++;
+		env = env->next;
+	}
+	envp = (char **)malloc(sizeof(char *) * (i + 1));
+	if (envp == NULL)
+		exit_with_error("minishell: malloc error");
+	i = 0;
+	env = env_list;
+	while (env)
+	{
+		envp[i] = ft_strjoin(env->name, "=");
+		envp[i] = ft_strjoin(envp[i], env->value);
+		i++;
+		env = env->next;
+	}
+	envp[i] = NULL;
+	return (envp);
 }

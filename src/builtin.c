@@ -6,22 +6,22 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/12 01:27:39 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 17:36:05 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	builtin_echo(char **argv)
+static int	builtin_echo(char **argv)
 {
-	int	i;
-	int	newline;
+	int		i;
+	bool	newline;
 
-	newline = 1;
+	newline = true;
 	i = 1;
 	if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
 	{
-		newline = 0;
+		newline = false;
 		i++;
 	}
 	while (argv[i])
@@ -36,149 +36,138 @@ int	builtin_echo(char **argv)
 	return (0);
 }
 
-int	builtin_cd(char **argv)
+static int	builtin_cd(char **argv)
 {
-	char	*path;
-
 	if (argv[1] == NULL)
 	{
-		char	*home;
-
-		home = getenv("HOME");
-		if (home == NULL)
+		if (chdir(getenv("HOME")) == -1)
 		{
-			printf("minishell: cd: HOME not set\n");
+			perror("cd");
 			return (1);
 		}
-		path = home;
 	}
 	else
-		path = expand_variable(argv[1], 0); // 環境変数を展開
-	if (chdir(path) == -1)
 	{
-		perror("minishell: cd");
-		if (argv[1] != NULL)
-			free(path);
-		return (1);
+		if (chdir(argv[1]) == -1)
+		{
+			perror("cd");
+			return (1);
+		}
 	}
-	if (argv[1] != NULL)
-		free(path);
 	return (0);
 }
 
-int	builtin_pwd(char **argv)
+static int	builtin_pwd(char **argv)
 {
 	char	cwd[PATH_MAX];
 
 	(void)argv;
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 	{
-		perror("minishell: pwd");
+		perror("getcwd");
 		return (1);
 	}
 	printf("%s\n", cwd);
 	return (0);
 }
 
-int	builtin_exit(char **argv)
+static int	builtin_export(char **argv, t_env **env_list)
+{
+	char	*equals_pos;
+	char	*name;
+	char	*value;
+
+	if (argv[1] == NULL)
+	{
+		print_env_list(*env_list);
+		return (0);
+	}
+
+	equals_pos = ft_strchr(argv[1], '=');
+	if (!equals_pos)
+		return (set_env_value(env_list, argv[1], ""));
+
+	name = ft_strndup(argv[1], equals_pos - argv[1]);
+	if (!name)
+		return (1);
+
+	value = equals_pos + 1;
+	if (set_env_value(env_list, name, value) != 0)
+	{
+		free(name);
+		return (1);
+	}
+
+	free(name);
+	return (0);
+}
+
+static int	builtin_unset(char **argv, t_env **env_list)
+{
+	if (argv[1] == NULL)
+		return (1);
+	unset_env_value(env_list, argv[1]);
+	return (0);
+}
+
+static int	builtin_env(char **argv, t_env **env_list)
+{
+	(void)argv;
+	print_env_list(*env_list);
+	return (0);
+}
+
+static int	builtin_exit(char **argv)
 {
 	int	exit_status;
 
-	exit_status = 0;
-	if (argv[1])
+	if (argv[1] == NULL)
+		exit(0);
+	if (ft_isnumber(argv[1]) == false)
 	{
-		if (!ft_isinteger(argv[1]))
-		{
-			printf("minishell: exit: numeric argument required\n");
-			return (255);
-		}
-		exit_status = ft_atoi(argv[1]);
-		if (exit_status < 0 || exit_status > 255) // exit status が 0 ~ 255 の範囲外の場合の処理を追加
-		{
-			printf("minishell: exit: numeric argument required\n");
-			return (255);
-		}
+		fprintf(stderr, "minishell: exit: %s: numeric argument required\n",
+			argv[1]);
+		exit(255);
 	}
+	exit_status = ft_atoi(argv[1]);
 	exit(exit_status);
 }
 
-int	builtin_export(char **argv, t_env **env_head)
+t_builtin_type	get_builtin_type(const char *cmd)
 {
-	t_env	*env;
-	char	*key;
-	char	*value;
-	int		i;
-
-	i = 1;
-	while (argv[i])
-	{
-		if (!is_valid_identifier(argv[i])) // 識別子のバリデーション
-		{
-			printf("minishell: export: `%s': not a valid identifier\n", argv[i]);
-			return (1); // bashと同じexit status
-		}
-		key = ft_strndup(argv[i], ft_strchr(argv[i], '=') - argv[i]);
-		if (key == NULL)
-			fatal_error("malloc");
-		value = ft_strdup(ft_strchr(argv[i], '=') + 1);
-		if (value == NULL)
-			fatal_error("malloc");
-		env = search_env(*env_head, key);
-		if (env)
-		{
-			free(env->value);
-			env->value = value;
-		}
-		else
-		{
-			env = (t_env *)malloc(sizeof(t_env));
-			if (env == NULL)
-				fatal_error("malloc");
-			env->key = key;
-			env->value = value;
-			env->next = NULL;
-			append_env(env_head, env);
-		}
-		i++;
-	}
-	return (0);
+	if (ft_strcmp(cmd, "echo") == 0)
+		return (BUILTIN_ECHO);
+	if (ft_strcmp(cmd, "cd") == 0)
+		return (BUILTIN_CD);
+	if (ft_strcmp(cmd, "pwd") == 0)
+		return (BUILTIN_PWD);
+	if (ft_strcmp(cmd, "export") == 0)
+		return (BUILTIN_EXPORT);
+	if (ft_strcmp(cmd, "unset") == 0)
+		return (BUILTIN_UNSET);
+	if (ft_strcmp(cmd, "env") == 0)
+		return (BUILTIN_ENV);
+	if (ft_strcmp(cmd, "exit") == 0)
+		return (BUILTIN_EXIT);
+	return (BUILTIN_UNKNOWN);
 }
 
-int	builtin_unset(char **argv, t_env **env_head)
+int	execute_builtin(t_builtin_type type, char **argv, t_env **env_list)
 {
-	int		i;
-	t_env	*env;
-	t_env	*prev;
+	if (type == BUILTIN_ECHO)
+		return (builtin_echo(argv));
+	if (type == BUILTIN_CD)
+		return (builtin_cd(argv));
+	if (type == BUILTIN_PWD)
+		return (builtin_pwd(argv));
+	if (type == BUILTIN_EXPORT)
+		return (builtin_export(argv, env_list));
+	if (type == BUILTIN_UNSET)
+		return (builtin_unset(argv, env_list));
+	if (type == BUILTIN_ENV)
+		return (builtin_env(argv, env_list));
+	if (type == BUILTIN_EXIT)
+		return (builtin_exit(argv));
+	return (1);
 
-	i = 1;
-	while (argv[i])
-	{
-		env = *env_head;
-		prev = NULL;
-		while (env)
-		{
-			if (ft_strcmp(env->key, argv[i]) == 0)
-			{
-				if (prev)
-					prev->next = env->next;
-				else
-					*env_head = env->next;
-				free(env->key);
-				free(env->value);
-				free(env);
-				break ;
-			}
-			prev = env;
-			env = env->next;
-		}
-		i++;
-	}
-	return (0);
-}
-
-int	builtin_env(char **argv, t_env *env)
-{
-	(void)argv;
-	print_env(env);
-	return (0);
 }
