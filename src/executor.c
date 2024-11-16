@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 17:38:20 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 23:49:23 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ static int	execute_external(char **argv, t_redirect *redirects,
 	exec_path = find_executable(argv[0], env_list);
 	if (!exec_path)
 	{
-		fprintf(stderr, "minishell: command not found: %s\n", argv[0]);
+		fprintf(stderr, "minishell: %s: command not found\n", argv[0]);
 		return (127);
 	}
 
