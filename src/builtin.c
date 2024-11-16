@@ -73,6 +73,7 @@ static int	builtin_pwd(char **argv)
 
 static int	builtin_export(char **argv, t_env **env_list)
 {
+	char	*equals_pos;
 	char	*name;
 	char	*value;
 
@@ -81,9 +82,24 @@ static int	builtin_export(char **argv, t_env **env_list)
 		print_env_list(*env_list);
 		return (0);
 	}
-	name = strtok(argv[1], "=");
-	value = strtok(NULL, "=");
-	return (set_env_value(env_list, name, value));
+
+	equals_pos = ft_strchr(argv[1], '=');
+	if (!equals_pos)
+		return (set_env_value(env_list, argv[1], ""));
+
+	name = ft_strndup(argv[1], equals_pos - argv[1]);
+	if (!name)
+		return (1);
+
+	value = equals_pos + 1;
+	if (set_env_value(env_list, name, value) != 0)
+	{
+		free(name);
+		return (1);
+	}
+
+	free(name);
+	return (0);
 }
 
 static int	builtin_unset(char **argv, t_env **env_list)
