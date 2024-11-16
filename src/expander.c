@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 16:03:16 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/16 23:09:39 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,19 +140,6 @@ void	expand(t_node *node, t_env *env_list)
 	expand_redirects(node->redirects, env_list);
 	expand(node->next, env_list);
 }
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/16 16:30:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 16:30:24 by nkannan          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "../include/minishell.h"
 
 static char	*get_env_name(const char *str)
 {
@@ -185,7 +172,7 @@ char	*expand_env_var(char *str)
 	{
 		if (str[i] == '\'')
 			in_single_quote = !in_single_quote;
-		if (str[i] == '$' && !in_single_quote && str[i + 1] && 
+		if (str[i] == '$' && !in_single_quote && str[i + 1] &&
 			(ft_isalnum(str[i + 1]) || str[i + 1] == '_'))
 		{
 			i++;
