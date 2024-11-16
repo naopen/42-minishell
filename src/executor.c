@@ -91,14 +91,56 @@ int	handle_heredoc(t_redirect *redirect)
 	}
 }
 
+static char *find_executable(const char *cmd, t_env *env_list)
+{
+    char *path_env;
+    char *path;
+    char *dir;
+    char *exec_path;
+    
+    if (ft_strchr(cmd, '/'))
+        return (ft_strdup(cmd));
+    
+    path_env = get_env_value(env_list, "PATH");
+    if (!path_env)
+        return (NULL);
+    
+    path = ft_strdup(path_env);
+    dir = ft_strtok(path, ":");
+    
+    while (dir)
+    {
+        exec_path = ft_strjoin(dir, "/");
+        exec_path = ft_strjoin_free(exec_path, ft_strdup(cmd));
+        
+        if (access(exec_path, X_OK) == 0)
+        {
+            free(path);
+            return (exec_path);
+        }
+        free(exec_path);
+        dir = ft_strtok(NULL, ":");
+    }
+    free(path);
+    return (NULL);
+}
+
 static int	execute_external(char **argv, t_redirect *redirects,
 		t_env *env_list)
 {
 	pid_t	pid;
 	int		status;
 	char	**envp;
+	char    *exec_path;
 
 	envp = NULL;
+	exec_path = find_executable(argv[0], env_list);
+	if (!exec_path)
+	{
+		fprintf(stderr, "minishell: command not found: %s\n", argv[0]);
+		return (127);
+	}
+
 	pid = fork();
 	if (pid == -1)
 		exit_with_error("minishell: fork error");
@@ -108,14 +150,17 @@ static int	execute_external(char **argv, t_redirect *redirects,
 		if (do_redirection(redirects) == 1)
 		{
 			ft_strarrdel(envp);
+			free(exec_path);
 			exit(1);
 		}
-		if (execve(argv[0], argv, envp) == -1)
+		if (execve(exec_path, argv, envp) == -1)
 		{
 			ft_strarrdel(envp);
+			free(exec_path);
 			exit_with_error("minishell: execve error");
 		}
 	}
+	free(exec_path);
 	else
 	{
 		ft_strarrdel(envp);
