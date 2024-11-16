@@ -40,12 +40,20 @@ int	main(int argc, char **argv, char **environ)
 		if (line == NULL)
 			break ;
 		if (*line != '\0')
+		{
 			add_history(line);
-		tokens = tokenize(line);
-		ast = parse(&tokens);
-		status = execute(ast, env_list);
-		free_token_list(tokens);
-		free_ast(ast);
+			tokens = tokenize(line);
+			if (tokens)
+			{
+				ast = parse(&tokens);
+				if (ast)
+				{
+					status = execute(ast, env_list);
+					free_ast(ast);
+				}
+				free_token_list(tokens);
+			}
+		}
 		free(line);
 	}
 	free_env_list(env_list);
