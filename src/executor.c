@@ -97,6 +97,7 @@ static char *find_executable(const char *cmd, t_env *env_list)
     char *path;
     char *dir;
     char *exec_path;
+    char *tmp;
     
     if (ft_strchr(cmd, '/'))
         return (ft_strdup(cmd));
@@ -106,12 +107,23 @@ static char *find_executable(const char *cmd, t_env *env_list)
         return (NULL);
     
     path = ft_strdup(path_env);
-    dir = ft_strtok(path, ":");
+    dir = path;
     
-    while (dir)
+    while (dir && *dir)
     {
+        tmp = ft_strchr(dir, ':');
+        if (tmp)
+            *tmp = '\0';
+            
         exec_path = ft_strjoin(dir, "/");
-        exec_path = ft_strjoin_free(exec_path, ft_strdup(cmd));
+        if (!exec_path)
+            return (NULL);
+            
+        tmp = ft_strjoin(exec_path, cmd);
+        free(exec_path);
+        if (!tmp)
+            return (NULL);
+        exec_path = tmp;
         
         if (access(exec_path, X_OK) == 0)
         {
@@ -119,7 +131,10 @@ static char *find_executable(const char *cmd, t_env *env_list)
             return (exec_path);
         }
         free(exec_path);
-        dir = ft_strtok(NULL, ":");
+        
+        if (!ft_strchr(dir, ':'))
+            break;
+        dir = ft_strchr(dir, ':') + 1;
     }
     free(path);
     return (NULL);
