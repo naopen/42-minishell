@@ -14,18 +14,12 @@
 
 static bool	is_n_option(const char *str)
 {
+	if (ft_strchr(str, '\"') || ft_strchr(str, '\''))
+		return (false);
 	if (str[0] != '-')
 		return (false);
 	if (str[1] != 'n')
 		return (false);
-	
-	size_t i = 2;
-	while (str[i])
-	{
-		if (str[i] != 'n')
-			return (false);
-		i++;
-	}
 	return (true);
 }
 
