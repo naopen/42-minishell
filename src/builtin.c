@@ -12,6 +12,17 @@
 
 #include "../include/minishell.h"
 
+static bool	is_n_option(const char *str)
+{
+	if (ft_strchr(str, '\"') || ft_strchr(str, '\''))
+		return (false);
+	if (str[0] != '-')
+		return (false);
+	if (str[1] != 'n')
+		return (false);
+	return (true);
+}
+
 static int	builtin_echo(char **argv)
 {
 	int		i;
@@ -19,11 +30,13 @@ static int	builtin_echo(char **argv)
 
 	newline = true;
 	i = 1;
-	if (argv[i] && ft_strcmp(argv[i], "-n") == 0)
+	
+	while (argv[i] && is_n_option(argv[i]))
 	{
 		newline = false;
 		i++;
 	}
+	
 	while (argv[i])
 	{
 		printf("%s", argv[i]);
@@ -31,6 +44,7 @@ static int	builtin_echo(char **argv)
 			printf(" ");
 		i++;
 	}
+	
 	if (newline)
 		printf("\n");
 	return (0);
