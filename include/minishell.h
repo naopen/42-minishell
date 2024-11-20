@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/20 17:39:31 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/11/20 20:51:15 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,9 @@ char	**ft_strarradd(char **arr, char *str);
 t_token	*tokenize(char *line);
 void	free_token_list(t_token *token_list);
 bool	is_quote(char c);
+
+// tokennizer_utils.c
+bool	is_metachar(char c);
 
 // parser.c
 t_node	*parse(t_token **token_list);
