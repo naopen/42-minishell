@@ -6,11 +6,29 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/20 17:40:21 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/11/20 21:45:46 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+// void	print_token(t_token *token)
+// {
+// 	int	index;
+
+// 	index = 1;
+// 	printf("-----debug-----\n");
+// 	while (token->type != TOKEN_EOF)
+// 	{
+// 		printf("token%d\n", index);
+// 		printf("token type : %d\n", token->type);
+// 		printf("token word : %s\n\n", token->word);
+// 		token = token->next;
+// 		index++;
+// 	}
+// 	printf("-----debug-----\n");
+// 	return ;
+// }
 
 void	handle_sigint(int sig)
 {

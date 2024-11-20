@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
+#    By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/08/15 16:53:46 by nkannan          ###   ########.fr        #
+#    Updated: 2024/11/20 21:28:19 by mkaihori         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,8 @@ SRCS = main.c \
        executor.c \
        builtin.c \
        env.c \
-       utils.c
+       utils.c \
+	   tokenizer_utils.c
 
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
