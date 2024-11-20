@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 16:02:24 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/11/20 21:43:30 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ static t_token	*split_token(char **line)
 	char	quote;
 
 	start = *line;
-	while (**line && !ft_strchr(" \t<>|;&", **line))
+	while (**line && !is_metachar(**line))
 	{
 		if (is_quote(**line))
 		{
@@ -86,6 +86,39 @@ static t_token	*split_token(char **line)
 	if (word == NULL)
 		exit_with_error("minishell: malloc error");
 	token = new_token(get_token_type(word), word);
+	if (token == NULL)
+	{
+		free(word);
+		exit_with_error("minishell: malloc error");
+	}
+	return (token);
+}
+
+static t_token	*split_token_op(char **line)
+{
+	t_token	*token;
+	char	*word;
+	int		op_size;
+
+	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
+		exit_with_error("Not implement\n");
+	else if (ft_strncmp(*line, "|", 1) == 0)
+		op_size = 1;
+	else if (ft_strncmp(*line, "<<", 2) == 0)
+		op_size = 2;
+	else if (ft_strncmp(*line, ">>", 2) == 0)
+		op_size = 2;
+	else if (ft_strncmp(*line, "<", 1) == 0)
+		op_size = 1;
+	else if (ft_strncmp(*line, ">", 1) == 0)
+		op_size = 1;
+	else
+		exit_with_error("metachar error\n");
+	word = ft_strndup(*line, op_size);
+	if (word == NULL)
+		exit_with_error("minishell: malloc error");
+	(*line) += op_size;
+	token = new_token(TOKEN_OPERATOR, word);
 	if (token == NULL)
 	{
 		free(word);
@@ -119,8 +152,16 @@ t_token	*tokenize(char *line)
 	{
 		while (*line == ' ' || *line == '\t')
 			line++;
-		token = split_token(&line);
-		add_token_to_list(&head, token);
+		if (is_metachar(*line))
+		{
+			token = split_token_op(&line);
+			add_token_to_list(&head, token);
+		}
+		else if (!is_metachar(*line))
+		{
+			token = split_token(&line);
+			add_token_to_list(&head, token);
+		}
 	}
 	token = new_token(TOKEN_EOF, NULL);
 	add_token_to_list(&head, token);
