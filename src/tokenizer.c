@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/20 21:43:30 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/11/27 17:46:37 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ static t_token	*split_token_op(char **line)
 	char	*word;
 	int		op_size;
 
+	op_size = 0;
 	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
 		exit_with_error("Not implement\n");
 	else if (ft_strncmp(*line, "|", 1) == 0)
