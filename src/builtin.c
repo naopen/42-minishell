@@ -85,11 +85,41 @@ static int	builtin_pwd(char **argv)
 	return (0);
 }
 
+static bool	is_valid_identifier(const char *str)
+{
+	const char	*name;
+	char		*equals_pos;
+
+	if (!str || !*str)
+		return (false);
+	
+	equals_pos = ft_strchr(str, '=');
+	if (equals_pos)
+		name = ft_strndup(str, equals_pos - str);
+	else
+		name = str;
+
+	if (!ft_isalpha(*name) && *name != '_')
+		return (false);
+	
+	while (*++name && (equals_pos ? name < equals_pos : true))
+	{
+		if (!ft_isalnum(*name) && *name != '_')
+			return (false);
+	}
+	
+	if (equals_pos)
+		free((char *)name);
+	return (true);
+}
+
 static int	builtin_export(char **argv, t_env **env_list)
 {
 	char	*equals_pos;
 	char	*name;
 	char	*value;
+	int		status;
+	int		i;
 
 	if (argv[1] == NULL)
 	{
@@ -97,23 +127,37 @@ static int	builtin_export(char **argv, t_env **env_list)
 		return (0);
 	}
 
-	equals_pos = ft_strchr(argv[1], '=');
-	if (!equals_pos)
-		return (set_env_value(env_list, argv[1], ""));
-
-	name = ft_strndup(argv[1], equals_pos - argv[1]);
-	if (!name)
-		return (1);
-
-	value = equals_pos + 1;
-	if (set_env_value(env_list, name, value) != 0)
+	status = 0;
+	i = 1;
+	while (argv[i])
 	{
-		free(name);
-		return (1);
-	}
+		if (!is_valid_identifier(argv[i]))
+		{
+			ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+			ft_putstr_fd(argv[i], STDERR_FILENO);
+			ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
+			status = 1;
+			i++;
+			continue;
+		}
 
-	free(name);
-	return (0);
+		equals_pos = ft_strchr(argv[i], '=');
+		if (!equals_pos)
+		{
+			set_env_value(env_list, argv[i], "");
+		}
+		else
+		{
+			name = ft_strndup(argv[i], equals_pos - argv[i]);
+			if (!name)
+				return (1);
+			value = equals_pos + 1;
+			set_env_value(env_list, name, value);
+			free(name);
+		}
+		i++;
+	}
+	return (status);
 }
 
 static int	builtin_unset(char **argv, t_env **env_list)
