@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 17:36:05 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/01 17:41:38 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,23 @@ static bool	is_n_option(const char *str)
 		return (false);
 	if (str[1] != 'n')
 		return (false);
+	if (str[2] != '\0')
+		return (false);
 	return (true);
 }
 
-static int	builtin_echo(char **argv)
+static int	builtin_echo(char **argv, int *status)
 {
 	int		i;
 	bool	newline;
 
 	newline = true;
 	i = 1;
-	
-	while (argv[i] && is_n_option(argv[i]))
+	if (argv[i] && is_n_option(argv[i]))
 	{
 		newline = false;
 		i++;
 	}
-	
 	while (argv[i])
 	{
 		printf("%s", argv[i]);
@@ -44,10 +44,9 @@ static int	builtin_echo(char **argv)
 			printf(" ");
 		i++;
 	}
-	
 	if (newline)
 		printf("\n");
-	return (0);
+	return (*status);
 }
 
 static int	builtin_cd(char **argv)
@@ -210,10 +209,10 @@ t_builtin_type	get_builtin_type(const char *cmd)
 	return (BUILTIN_UNKNOWN);
 }
 
-int	execute_builtin(t_builtin_type type, char **argv, t_env **env_list)
+int	execute_builtin(t_builtin_type type, char **argv, t_env **env_list, int *status)
 {
 	if (type == BUILTIN_ECHO)
-		return (builtin_echo(argv));
+		return (builtin_echo(argv, status));
 	if (type == BUILTIN_CD)
 		return (builtin_cd(argv));
 	if (type == BUILTIN_PWD)

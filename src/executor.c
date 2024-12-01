@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 23:49:23 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/01 17:43:43 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,11 +146,10 @@ static char *find_executable(const char *cmd, t_env *env_list)
     return (NULL);
 }
 
-static int	execute_external(char **argv, t_redirect *redirects,
-		t_env *env_list)
+void	execute_external(char **argv, t_redirect *redirects,
+		t_env *env_list, int *status)
 {
 	pid_t	pid;
-	int		status;
 	char	**envp;
 	char    *exec_path;
 
@@ -159,13 +158,13 @@ static int	execute_external(char **argv, t_redirect *redirects,
 	if (!exec_path)
 	{
 		fprintf(stderr, "minishell: %s: command not found\n", argv[0]);
-		return (127);
+		*status = 127;
+		return ;
 	}
-
 	pid = fork();
 	if (pid == -1)
 		exit_with_error("minishell: fork error");
-	if (pid == 0)
+	if (!pid)
 	{
 		envp = env_to_envp(env_list);
 		if (do_redirection(redirects) == 1)
@@ -181,78 +180,69 @@ static int	execute_external(char **argv, t_redirect *redirects,
 			exit_with_error("minishell: execve error");
 		}
 	}
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	return (1);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		return (1);
-	}
+	waitpid(pid, status, 0);
+	if (WIFEXITED(*status))
+		*status = WEXITSTATUS(*status);
+	return ;
+}
 
-static int	execute_command(t_node *node, t_env *env_list)
+void	execute_command(t_node *node, t_env *env_list, int * status)
 {
 	t_builtin_type	builtin_type;
 
 	if (node == NULL)
-		return (0);
+		return ;
 	builtin_type = get_builtin_type(node->argv[0]);
 	if (builtin_type != BUILTIN_UNKNOWN)
-		return (execute_builtin(builtin_type, node->argv, &env_list));
-	return (execute_external(node->argv, node->redirects, env_list));
+		execute_builtin(builtin_type, node->argv, &env_list, status);
+	else
+		execute_external(node->argv, node->redirects, env_list, status);
+	return ;
 }
 
-static int	execute_pipeline(t_node *node, t_env *env_list)
+void	child_process(t_node *node, t_env *env_list, int *status, int pipefd[2])
+{
+	close(pipefd[0]);
+	if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+		exit_with_error("minishell: dup2 error");
+	close(pipefd[1]);
+	execute_command(node, env_list, status);
+	exit (*status);
+}
+
+void	execute_pipeline(t_node *node, t_env *env_list, int *status)
 {
 	int		pipefd[2];
-	pid_t	pid1;
-	pid_t	pid2;
-	int		status;
+	pid_t	parent;
 
 	if (node->next == NULL)
-		return (execute_command(node, env_list));
-
+		return (execute_command(node, env_list, status));
 	if (pipe(pipefd) == -1)
 		exit_with_error("minishell: pipe error");
-
-	pid1 = fork();
-	if (pid1 == -1)
+	parent = fork();
+	if (parent == -1)
 		exit_with_error("minishell: fork error");
-
-	if (pid1 == 0)
-	{
-		close(pipefd[0]);
-		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
-			exit_with_error("minishell: dup2 error");
-		close(pipefd[1]);
-		exit(execute_command(node, env_list));
-	}
-
-	pid2 = fork();
-	if (pid2 == -1)
-		exit_with_error("minishell: fork error");
-
-	if (pid2 == 0)
-	{
-		close(pipefd[1]);
-		if (dup2(pipefd[0], STDIN_FILENO) == -1)
-			exit_with_error("minishell: dup2 error");
-		close(pipefd[0]);
-		exit(execute_pipeline(node->next, env_list));
-	}
-
-	close(pipefd[0]);
+	if (!parent)
+		child_process(node, env_list, status, pipefd);
 	close(pipefd[1]);
-
-	waitpid(pid1, &status, 0);
-	waitpid(pid2, &status, 0);
-
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	return (1);
+	if (dup2(pipefd[0], STDIN_FILENO) == -1)
+		exit_with_error("minishell: dup2 error");
+	close(pipefd[0]);
+	waitpid(parent, status, 0);
+	execute_pipeline(node->next, env_list, status);
+	return ;
 }
 
-int	execute(t_node *node, t_env *env_list)
+void	execute(t_node *node, t_env *env_list, int *status)
 {
-	return (execute_pipeline(node, env_list));
+	int	backup;
+
+	backup = dup(STDIN_FILENO);
+	if (backup == -1)
+		exit_with_error("minishell: dup error");
+	execute_pipeline(node, env_list, status);
+	if (dup2(backup, STDIN_FILENO) == -1)
+		exit_with_error("minishell: dup2 error");
+	close(backup);
+	return ;
 }

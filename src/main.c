@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/20 21:45:46 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/01 16:56:04 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	main(int argc, char **argv, char **environ)
 				ast = parse(&tokens);
 				if (ast)
 				{
-					status = execute(ast, env_list);
+					execute(ast, env_list, &status);
 					free_ast(ast);
 				}
 				free_token_list(tokens);
@@ -76,5 +76,4 @@ int	main(int argc, char **argv, char **environ)
 	}
 	free_env_list(env_list);
 	return (status);
-
 }
