@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/20 20:51:15 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/01 17:21:27 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,13 +123,13 @@ void	expand(t_node *node, t_env *env_list);
 char	*expand_env_var(char *str);
 
 // executor.c
-int		execute(t_node *node, t_env *env_list);
+void	execute(t_node *node, t_env *env_list, int *status);
 int		handle_heredoc(t_redirect *redirect);
 
 // builtin.c
 t_builtin_type	get_builtin_type(const char *cmd);
 int				execute_builtin(t_builtin_type type, char **argv,
-					t_env **env_list);
+					t_env **env_list, int *status);
 
 // env.c
 t_env	*create_env_list(char **environ);
