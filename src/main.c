@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 19:24:21 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 19:53:18 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ int	main(int argc, char **argv, char **environ)
 	signal(SIGINT, handle_sigint);
 	while (1)
 	{
-		mini->line = readline("minishell> ");
+		mini->line = readline("> ");
 		if (mini->line == NULL)
 			break ;
 		if (*(mini->line) != '\0')

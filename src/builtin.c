@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:12:07 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 20:25:21 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,18 @@
 
 static bool	is_n_option(const char *str)
 {
+	int	i;
+
+	i = 0;
 	if (ft_strchr(str, '\"') || ft_strchr(str, '\''))
 		return (false);
-	if (str[0] != '-')
+	if (str[i++] != '-')
 		return (false);
-	if (str[1] != 'n')
+	if (str[i++] != 'n')
 		return (false);
-	if (str[2] != '\0')
+	while (str[i] == 'n')
+		i++;
+	if (str[i] != '\0')
 		return (false);
 	return (true);
 }
@@ -32,7 +37,7 @@ static int	builtin_echo(char **argv, int *status)
 
 	newline = true;
 	i = 1;
-	if (argv[i] && is_n_option(argv[i]))
+	while (argv[i] && is_n_option(argv[i]))
 	{
 		newline = false;
 		i++;

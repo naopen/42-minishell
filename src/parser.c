@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:01:04 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 20:29:51 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,11 @@ static char	**get_command_args(t_mini *mini, t_token **token_list, int argc)
 // 		redirect->type = REDIRECT_HEREDOC;
 // 		*token_list = (*token_list)->next;
 // 		if (*token_list == NULL || (*token_list)->type != TOKEN_WORD)
-// 			custum_error("minishell: syntax error: heredoc delimiter not found", 1);
+// 			custom_error("minishell: syntax error: heredoc delimiter not found", 1);
 // 		redirect->file_name = (*token_list)->word;
 // 	}
 // 	else
-// 		custum_error("minishell: syntax error: invalid redirect", 1);
+// 		custom_error("minishell: syntax error: invalid redirect", 1);
 // 	*token_list = (*token_list)->next;
 // 	return (redirect);
 // }

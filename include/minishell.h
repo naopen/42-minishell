@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:40:54 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 20:29:51 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void	free_env(t_env *env);
 char	**env_to_envp(t_mini *mini, t_env *env_list);
 
 void	syntax_error(t_mini *mini, t_token *token);
-void	custum_error(t_mini *mini, char *msg, int error);
+void	custom_error(t_mini *mini, char *msg, int error);
 int	do_redirection(t_mini *mini, t_redirect *redirect);
 int		finish_mini(t_mini *mini);
 void	free_node(t_node *node);

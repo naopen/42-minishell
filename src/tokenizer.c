@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 19:19:54 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 20:31:46 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	in_quote(t_mini *mini, char **line)
 	if (**line == quote)
 		(*line)++;
 	else
-		custum_error(mini, "minishell: syntax error: unclosed quote", 1);
+		custom_error(mini, "minishell: syntax error: unclosed quote", 1);
 	return ;
 }
 
@@ -119,7 +119,7 @@ static t_token	*split_token(t_mini *mini, char **line)
 int	get_opsize(t_mini *mini, char **line)
 {
 	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
-		custum_error(mini, "Not implement", 1);
+		custom_error(mini, "Not implement", 1);
 	else if (ft_strncmp(*line, "|", 1) == 0)
 		return (1);
 	else if (ft_strncmp(*line, "<<", 2) == 0)
@@ -130,7 +130,7 @@ int	get_opsize(t_mini *mini, char **line)
 		return (1);
 	else if (ft_strncmp(*line, ">", 1) == 0)
 		return(1);
-	custum_error(mini, "metachar error", 1);
+	custom_error(mini, "metachar error", 1);
 	exit(0);
 }
 

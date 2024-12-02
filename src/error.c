@@ -21,7 +21,7 @@ void	syntax_error(t_mini *mini, t_token *token)
 	exit(258) ;
 }
 
-void	custum_error(t_mini *mini, char *msg, int error)
+void	custom_error(t_mini *mini, char *msg, int error)
 {
 	if (dup2(STDERR_FILENO, STDOUT_FILENO) == -1)
 		system_error(mini);
@@ -29,5 +29,5 @@ void	custum_error(t_mini *mini, char *msg, int error)
 	if (dup2(mini->backup_out, STDOUT_FILENO) == -1)
 		system_error(mini);
 	finish_mini(mini);
-	exit(error) ;
+	exit(error);
 }
