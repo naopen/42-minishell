@@ -6,13 +6,13 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/01 23:49:41 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 16:11:10 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static char	*expand_variable(char *str, t_env *env_list)
+static char	*expand_variable(t_mini *mini, char *str, t_env *env_list)
 {
 	char	*result;
 	char	*var_name;
@@ -23,7 +23,7 @@ static char	*expand_variable(char *str, t_env *env_list)
 
 	result = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (result == NULL)
-		exit_with_error();
+		system_error(mini);
 	i = 0;
 	j = 0;
 	while (str[i])
@@ -34,9 +34,9 @@ static char	*expand_variable(char *str, t_env *env_list)
 			k = 0;
 			while (str[i + k] && (ft_isalnum(str[i + k]) || str[i + k] == '_'))
 				k++;
-			var_name = ft_strndup(str + i, k);
+			var_name = ft_strndup(mini, str + i, k);
 			if (var_name == NULL)
-				exit_with_error();
+				system_error(mini);
 			var_value = get_env_value(env_list, var_name);
 			free(var_name);
 			if (var_value)
@@ -53,7 +53,7 @@ static char	*expand_variable(char *str, t_env *env_list)
 	return (result);
 }
 
-static char	*expand_double_quote(char *str)
+static char	*expand_double_quote(t_mini *mini, char *str)
 {
 	char	*result;
 	size_t	i;
@@ -61,7 +61,7 @@ static char	*expand_double_quote(char *str)
 
 	result = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (result == NULL)
-		exit_with_error();
+		system_error(mini);
 	i = 0;
 	j = 0;
 	while (str[i])
@@ -101,7 +101,7 @@ static void	remove_quotes(char **str)
 	*str = new_str;
 }
 
-static void	expand_argv(char **argv, t_env *env_list)
+static void	expand_argv(t_mini *mini, char **argv, t_env *env_list)
 {
 	int		i;
 	char	*expanded_str;
@@ -111,37 +111,37 @@ static void	expand_argv(char **argv, t_env *env_list)
 	{
 		if (ft_strchr(argv[i], '$'))
 		{
-			expanded_str = expand_variable(argv[i], env_list);
+			expanded_str = expand_variable(mini, argv[i], env_list);
 			free(argv[i]);
 			argv[i] = expanded_str;
 		}
 		if (ft_strchr(argv[i], '\"'))
-			argv[i] = expand_double_quote(argv[i]);
+			argv[i] = expand_double_quote(mini, argv[i]);
 		remove_quotes(&argv[i]);
 		i++;
 	}
 }
 
-static void	expand_redirects(t_redirect *redirects, t_env *env_list)
+static void	expand_redirects(t_mini *mini, t_redirect *redirects, t_env *env_list)
 {
 	while (redirects)
 	{
-		redirects->file_name = expand_variable(redirects->file_name,
+		redirects->file_name = expand_variable(mini, redirects->file_name,
 				env_list);
 		redirects = redirects->next;
 	}
 }
 
-void	expand(t_node *node, t_env *env_list)
+void	expand(t_mini *mini, t_node *node, t_env *env_list)
 {
 	if (node == NULL)
 		return ;
-	expand_argv(node->argv, env_list);
-	expand_redirects(node->redirects, env_list);
-	expand(node->next, env_list);
+	expand_argv(mini, node->argv, env_list);
+	expand_redirects(mini, node->redirects, env_list);
+	expand(mini, node->next, env_list);
 }
 
-static char	*get_env_name(const char *str)
+static char	*get_env_name(t_mini *mini, const char *str)
 {
 	int		i;
 	char	*name;
@@ -149,13 +149,13 @@ static char	*get_env_name(const char *str)
 	i = 0;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
-	name = ft_strndup(str, i);
+	name = ft_strndup(mini, str, i);
 	if (!name)
-		exit_with_error();
+		system_error(mini);
 	return (name);
 }
 
-char	*expand_env_var(char *str)
+char	*expand_env_var(t_mini *mini, char *str)
 {
 	char	*result;
 	char	*env_name;
@@ -165,7 +165,7 @@ char	*expand_env_var(char *str)
 
 	result = ft_strdup("");
 	if (!result)
-		exit_with_error();
+		system_error(mini);
 	i = 0;
 	in_single_quote = 0;
 	while (str[i])
@@ -176,7 +176,7 @@ char	*expand_env_var(char *str)
 			(ft_isalnum(str[i + 1]) || str[i + 1] == '_'))
 		{
 			i++;
-			env_name = get_env_name(str + i);
+			env_name = get_env_name(mini, str + i);
 			env_value = getenv(env_name);
 			if (env_value)
 			{
@@ -191,7 +191,7 @@ char	*expand_env_var(char *str)
 		{
 			char *tmp = malloc(ft_strlen(result) + 2);
 			if (!tmp)
-				exit_with_error();
+				system_error(mini);
 			ft_strlcpy(tmp, result, ft_strlen(result) + 1);
 			tmp[ft_strlen(result)] = str[i++];
 			tmp[ft_strlen(result) + 1] = '\0';

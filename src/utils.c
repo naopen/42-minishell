@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 11:56:06 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 16:14:13 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ bool	ft_isnumber(const char *str)
 	return (true);
 }
 
-char	*ft_strndup(const char *s, size_t n)
+char	*ft_strndup(t_mini *mini, const char *s, size_t n)
 {
 	size_t	i;
 	char	*str;
@@ -37,12 +37,12 @@ char	*ft_strndup(const char *s, size_t n)
 		i++;
 	str = (char *)malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
-		exit_with_error();
+		system_error(mini);
 	ft_strlcpy(str, s, i + 1);
 	return (str);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+char	*mn_substr(t_mini *mini, char const *s, unsigned int start, size_t len)
 {
 	char	*substr;
 	size_t	i;
@@ -55,7 +55,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		len = ft_strlen(s) - (size_t)start;
 	substr = (char *)malloc(sizeof(char) * (len + 1));
 	if (substr == NULL)
-		exit_with_error();
+		system_error(mini);
 	i = 0;
 	while (i < len)
 	{
@@ -75,22 +75,6 @@ void	ft_strdel(char **as)
 	}
 }
 
-void	ft_strarrdel(char **arr)
-{
-	int	i;
-
-	if (arr)
-	{
-		i = 0;
-		while (arr[i])
-		{
-			ft_strdel(&arr[i]);
-			i++;
-		}
-		free(arr);
-	}
-}
-
 int	ft_strarrlen(char **arr)
 {
 	int	len;
@@ -101,7 +85,7 @@ int	ft_strarrlen(char **arr)
 	return (len);
 }
 
-char	**ft_strarradd(char **arr, char *str)
+char	**ft_strarradd(t_mini *mini, char **arr, char *str)
 {
 	char	**new_arr;
 	int		len;
@@ -110,7 +94,7 @@ char	**ft_strarradd(char **arr, char *str)
 	len = ft_strarrlen(arr);
 	new_arr = (char **)malloc(sizeof(char *) * (len + 2));
 	if (new_arr == NULL)
-		exit_with_error();
+		system_error(mini);
 	i = 0;
 	while (i < len)
 	{
@@ -123,37 +107,37 @@ char	**ft_strarradd(char **arr, char *str)
 	return (new_arr);
 }
 
-char	*ft_strjoin_char_free(char *s1, char s2)
+char	*ft_strjoin_char_free(t_mini *mini, char *s1, char s2)
 {
 	char	*new_str;
 
 	new_str = ft_strjoin(s1, &s2);
 	if (new_str == NULL)
-		exit_with_error();
+		system_error(mini);
 	free(s1);
 	return (new_str);
 }
 
-char	*ft_strjoin_free(char *s1, char *s2)
+char	*ft_strjoin_free(t_mini *mini, char *s1, char *s2)
 {
 	char	*new_str;
 
 	new_str = ft_strjoin(s1, s2);
 	if (new_str == NULL)
-		exit_with_error();
+		system_error(mini);
 	free(s1);
 	free(s2);
 	return (new_str);
 }
 
-char	*ft_strjoin_space_free(char *s1, char *s2)
+char	*ft_strjoin_space_free(t_mini *mini, char *s1, char *s2)
 {
 	char	*new_str;
 
 	new_str = ft_strjoin(s1, " ");
 	if (new_str == NULL)
-		exit_with_error();
-	new_str = ft_strjoin_free(new_str, s2);
+		system_error(mini);
+	new_str = ft_strjoin_free(mini, new_str, s2);
 	return (new_str);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/01 23:53:00 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 16:40:54 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,18 +97,29 @@ typedef enum e_builtin_type
 	BUILTIN_UNKNOWN,
 }	t_builtin_type;
 
+typedef struct s_mini
+{
+	struct s_token	*token;
+	struct s_node	*node;
+	struct s_env	*env;
+	char			*line;
+	int				backup_in;
+	int				backup_out;
+	int				status;
+}	t_mini;
+
 // utils.c
 
-void	exit_with_error(void);
+void	system_error(t_mini *mini);
 bool	ft_isnumber(const char *str);
-char	*ft_strndup(const char *s1, size_t n);
+char	*ft_strndup(t_mini *mini, const char *s, size_t n);
 void	ft_strdel(char **as);
 void	ft_strarrdel(char **arr);
 int		ft_strarrlen(char **arr);
-char	**ft_strarradd(char **arr, char *str);
+char	**ft_strarradd(t_mini *mini, char **arr, char *str);
 
 // tokenizer.c
-t_token	*tokenize(char *line);
+t_token	*tokenize(t_mini *mini, char *line);
 void	free_token_list(t_token *token_list);
 bool	is_quote(char c);
 
@@ -116,33 +127,33 @@ bool	is_quote(char c);
 bool	is_metachar(char c);
 
 // parser.c
-t_node	*parse(t_token **token_list);
-void	free_ast(t_node *ast);
+t_node	*parse(t_mini *mini, t_token **token_list);
 
 // expander.c
-void	expand(t_node *node, t_env *env_list);
-char	*expand_env_var(char *str);
+void	expand(t_mini *mini, t_node *node, t_env *env_list);
+char	*expand_env_var(t_mini *mini, char *str);
 
 // executor.c
-void	execute(t_node *node, t_env *env_list, int *status);
-int		handle_heredoc(t_redirect *redirect);
+void	execute(t_mini *mini);
+int	handle_heredoc(t_mini *mini, t_redirect *redirect);
 
 // builtin.c
 t_builtin_type	get_builtin_type(const char *cmd);
-int				execute_builtin(t_builtin_type type, char **argv,
-					t_env **env_list, int *status);
+int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_list, int *status);
 
 // env.c
-t_env	*create_env_list(char **environ);
+t_env	*create_env_list(t_mini *mini, char **environ);
 char	*get_env_value(t_env *env_list, const char *name);
-int		set_env_value(t_env **env_list, const char *name,
-			const char *value);
+int	set_env_value(t_mini *mini, t_env **env_list, const char *name, const char *value);
 void	unset_env_value(t_env **env_list, const char *name);
 void	print_env_list(t_env *env_list);
-void	free_env_list(t_env *env_list);
-char	**env_to_envp(t_env *env_list);
+void	free_env(t_env *env);
+char	**env_to_envp(t_mini *mini, t_env *env_list);
 
-void	syntax_error(t_token *token);
-void	custum_error(char *msg, int error);
+void	syntax_error(t_mini *mini, t_token *token);
+void	custum_error(t_mini *mini, char *msg, int error);
+int	do_redirection(t_mini *mini, t_redirect *redirect);
+int		finish_mini(t_mini *mini);
+void	free_node(t_node *node);
 
 #endif

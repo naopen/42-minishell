@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/01 17:41:38 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 16:12:07 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ static int	builtin_pwd(char **argv)
 	return (0);
 }
 
-static bool	is_valid_identifier(const char *str)
+static bool	is_valid_identifier(t_mini *mini, const char *str)
 {
 	const char	*name;
 	char		*equals_pos;
@@ -94,7 +94,7 @@ static bool	is_valid_identifier(const char *str)
 	
 	equals_pos = ft_strchr(str, '=');
 	if (equals_pos)
-		name = ft_strndup(str, equals_pos - str);
+		name = ft_strndup(mini, str, equals_pos - str);
 	else
 		name = str;
 
@@ -112,7 +112,7 @@ static bool	is_valid_identifier(const char *str)
 	return (true);
 }
 
-static int	builtin_export(char **argv, t_env **env_list)
+static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 {
 	char	*equals_pos;
 	char	*name;
@@ -130,7 +130,7 @@ static int	builtin_export(char **argv, t_env **env_list)
 	i = 1;
 	while (argv[i])
 	{
-		if (!is_valid_identifier(argv[i]))
+		if (!is_valid_identifier(mini, argv[i]))
 		{
 			ft_putstr_fd("minishell: export: `", STDERR_FILENO);
 			ft_putstr_fd(argv[i], STDERR_FILENO);
@@ -143,15 +143,15 @@ static int	builtin_export(char **argv, t_env **env_list)
 		equals_pos = ft_strchr(argv[i], '=');
 		if (!equals_pos)
 		{
-			set_env_value(env_list, argv[i], "");
+			set_env_value(mini, env_list, argv[i], "");
 		}
 		else
 		{
-			name = ft_strndup(argv[i], equals_pos - argv[i]);
+			name = ft_strndup(mini, argv[i], equals_pos - argv[i]);
 			if (!name)
 				return (1);
 			value = equals_pos + 1;
-			set_env_value(env_list, name, value);
+			set_env_value(mini, env_list, name, value);
 			free(name);
 		}
 		i++;
@@ -209,7 +209,7 @@ t_builtin_type	get_builtin_type(const char *cmd)
 	return (BUILTIN_UNKNOWN);
 }
 
-int	execute_builtin(t_builtin_type type, char **argv, t_env **env_list, int *status)
+int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_list, int *status)
 {
 	if (type == BUILTIN_ECHO)
 		return (builtin_echo(argv, status));
@@ -218,7 +218,7 @@ int	execute_builtin(t_builtin_type type, char **argv, t_env **env_list, int *sta
 	if (type == BUILTIN_PWD)
 		return (builtin_pwd(argv));
 	if (type == BUILTIN_EXPORT)
-		return (builtin_export(argv, env_list));
+		return (builtin_export(mini, argv, env_list));
 	if (type == BUILTIN_UNSET)
 		return (builtin_unset(argv, env_list));
 	if (type == BUILTIN_ENV)

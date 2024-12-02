@@ -6,19 +6,19 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 12:00:13 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 16:01:04 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static t_node	*new_node(t_node_type type)
+static t_node	*new_node(t_mini *mini, t_node_type type)
 {
 	t_node	*node;
 
 	node = (t_node *)malloc(sizeof(t_node));
 	if (node == NULL)
-		exit_with_error();
+		system_error(mini);
 	node->type = type;
 	node->argv = NULL;
 	node->redirects = NULL;
@@ -26,7 +26,7 @@ static t_node	*new_node(t_node_type type)
 	return (node);
 }
 
-static char	**get_command_args(t_token **token_list, int argc)
+static char	**get_command_args(t_mini *mini, t_token **token_list, int argc)
 {
 	char	**strs;
 	t_token	*token;
@@ -34,7 +34,7 @@ static char	**get_command_args(t_token **token_list, int argc)
 	token = *token_list;
 	strs = (char **)malloc(sizeof(char *) * (argc + 1));
 	if (!strs)
-		exit_with_error();
+		system_error(mini);
 	argc = 0;
 	while (token->type != TOKEN_OPERATOR && token->type != TOKEN_EOF)
 	{
@@ -42,7 +42,7 @@ static char	**get_command_args(t_token **token_list, int argc)
 			token = token->next->next;
 		else
 		{
-			strs[argc++] = expand_env_var(ft_strdup(token->word));
+			strs[argc++] = expand_env_var(mini, ft_strdup(token->word));
 			token = token->next;
 		}
 	}
@@ -57,7 +57,7 @@ static char	**get_command_args(t_token **token_list, int argc)
 
 // 	redirect = (t_redirect *)malloc(sizeof(t_redirect));
 // 	if (redirect == NULL)
-// 		exit_with_error();
+// 		system_error(mini);
 // 	if ((*token_list)->type == TOKEN_REDIRECT_IN)
 // 		redirect->type = REDIRECT_IN;
 // 	else if ((*token_list)->type == TOKEN_REDIRECT_OUT)
@@ -94,19 +94,19 @@ static void	add_redirect_to_list(t_redirect **head, t_redirect *redirect)
 	return ;
 }
 
-char	*get_filename(t_token *token)
+char	*get_filename(t_mini *mini, t_token *token)
 {
 	char	*filename;
 
 	filename = NULL;
 	if (token->type == TOKEN_EOF || is_metachar(token->word[0]))
-		syntax_error(token);
+		syntax_error(mini, token);
 	else
 		filename = ft_strdup(token->word);
 	return (filename);
 }
 
-void	add_redirect(t_node *node, t_token **token_list)
+void	add_redirect(t_mini *mini, t_node *node, t_token **token_list)
 {
 	t_token		*token;
 	t_redirect	*red;
@@ -114,17 +114,17 @@ void	add_redirect(t_node *node, t_token **token_list)
 	token = *token_list;
 	red = (t_redirect *)malloc(sizeof(t_redirect) * 1);
 	if (!red)
-		exit_with_error();
+		system_error(mini);
 	red->next = NULL;
 	red->type = (t_redirect_type)token->type;
 	token = token->next;
-	red->file_name = get_filename(token);
+	red->file_name = get_filename(mini, token);
 	add_redirect_to_list(&(node->redirects), red);
 	*token_list = token;
 	return ;
 }
 
-static t_node	*parse_process(t_token **token_list)
+static t_node	*parse_process(t_mini *mini, t_token **token_list)
 {
 	t_node		*command;
 	t_token		*token;
@@ -132,55 +132,34 @@ static t_node	*parse_process(t_token **token_list)
 
 	token = *token_list;
 	argc = 0;
-	command = new_node(NODE_COMMAND);
+	command = new_node(mini, NODE_COMMAND);
 	while (token->type != TOKEN_OPERATOR && token->type != TOKEN_EOF)
 	{
 		if (token->type != TOKEN_WORD)
-			add_redirect(command, &token);
+			add_redirect(mini, command, &token);
 		else
 		{
 			argc++;
 			token = token->next;
 		}
 	}
-	command->argv = get_command_args(token_list, argc);
+	command->argv = get_command_args(mini, token_list, argc);
 	return (command);
 }
 
-t_node	*parse(t_token **token_list)
+t_node	*parse(t_mini *mini, t_token **token_list)
 {
 	t_node	*head;
 	t_node	*node;
 
-	head = parse_process(token_list);
+	head = parse_process(mini, token_list);
 	node = head;
 	while (*token_list && (*token_list)->type == TOKEN_OPERATOR
 		&& ft_strcmp((*token_list)->word, "|") == 0)
 	{
 		*token_list = (*token_list)->next;
-		node->next = parse_process(token_list);
+		node->next = parse_process(mini, token_list);
 		node = node->next;
 	}
 	return (head);
-}
-
-void	free_ast(t_node *ast)
-{
-	t_node		*tmp_node;
-	t_redirect	*tmp_redirect;
-
-	while (ast)
-	{
-		tmp_node = ast->next;
-		ft_strarrdel(ast->argv);
-		while (ast->redirects)
-		{
-			tmp_redirect = ast->redirects->next;
-			free(ast->redirects->file_name);
-			free(ast->redirects);
-			ast->redirects = tmp_redirect;
-		}
-		free(ast);
-		ast = tmp_node;
-	}
 }
