@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:36:00 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/02 15:22:13 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ int	do_redirection(t_redirect *redir)
 	if (fd == -1)
 		return (-1);
 	if (dup2(fd, redir->fd) == -1)
-		exit_with_error("dup2");
+		system_error(mini);
 	if (close(fd) == -1)
-		exit_with_error("close");
+		system_error(mini);
 	return (0);
 }
 
@@ -70,7 +70,7 @@ int	heredoc(char *delimiter)
 	int		pfd[2];
 
 	if (pipe(pfd) == -1)
-		exit_with_error("pipe");
+		system_error(mini);
 	while (1)
 	{
 		line = readline("> ");
@@ -85,6 +85,6 @@ int	heredoc(char *delimiter)
 		free(line);
 	}
 	if (close(pfd[1]) == -1)
-		exit_with_error("close");
+		system_error(mini);
 	return (pfd[0]);
 }
