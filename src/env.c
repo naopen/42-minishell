@@ -6,11 +6,27 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:12:18 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 18:56:13 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+void	add_env_list(t_env **head, t_env *new)
+{
+	t_env *tmp;
+
+	if (*head == NULL)
+	{
+		*head = new;
+		return ;
+	}
+	tmp = *head;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new;
+	return ;
+}
 
 t_env	*create_env_list(t_mini *mini, char **environ)
 {
@@ -29,8 +45,8 @@ t_env	*create_env_list(t_mini *mini, char **environ)
 			system_error(mini);
 		env->name = name;
 		env->value = value;
-		env->next = head;
-		head = env;
+		env->next = NULL;
+		add_env_list(&head, env);
 		environ++;
 	}
 	return (head);

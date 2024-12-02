@@ -29,5 +29,5 @@ void	custum_error(t_mini *mini, char *msg, int error)
 	if (dup2(mini->backup_out, STDOUT_FILENO) == -1)
 		system_error(mini);
 	finish_mini(mini);
-	exit(error);
+	exit(error) ;
 }
