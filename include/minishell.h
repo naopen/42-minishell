@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/01 17:21:27 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/01 23:53:00 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,12 @@
 
 typedef enum e_token_type
 {
-	TOKEN_WORD,
-	TOKEN_OPERATOR,
 	TOKEN_REDIRECT_IN,
 	TOKEN_REDIRECT_OUT,
 	TOKEN_REDIRECT_APPEND,
 	TOKEN_HEREDOC,
+	TOKEN_WORD,
+	TOKEN_OPERATOR,
 	TOKEN_EOF,
 }	t_token_type;
 
@@ -98,7 +98,8 @@ typedef enum e_builtin_type
 }	t_builtin_type;
 
 // utils.c
-void	exit_with_error(const char *msg);
+
+void	exit_with_error(void);
 bool	ft_isnumber(const char *str);
 char	*ft_strndup(const char *s1, size_t n);
 void	ft_strdel(char **as);
@@ -140,5 +141,8 @@ void	unset_env_value(t_env **env_list, const char *name);
 void	print_env_list(t_env *env_list);
 void	free_env_list(t_env *env_list);
 char	**env_to_envp(t_env *env_list);
+
+void	syntax_error(t_token *token);
+void	custum_error(char *msg, int error);
 
 #endif

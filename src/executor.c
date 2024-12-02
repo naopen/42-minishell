@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/01 17:43:43 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/01 23:49:12 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,27 +22,27 @@ static int	do_redirection(t_redirect *redirect)
 		{
 			fd = open(redirect->file_name, O_RDONLY);
 			if (fd == -1)
-				exit_with_error("minishell: open error");
+				exit_with_error();
 			if (dup2(fd, STDIN_FILENO) == -1)
-				exit_with_error("minishell: dup2 error");
+				exit_with_error();
 			close(fd);
 		}
 		else if (redirect->type == REDIRECT_OUT)
 		{
 			fd = open(redirect->file_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd == -1)
-				exit_with_error("minishell: open error");
+				exit_with_error();
 			if (dup2(fd, STDOUT_FILENO) == -1)
-				exit_with_error("minishell: dup2 error");
+				exit_with_error();
 			close(fd);
 		}
 		else if (redirect->type == REDIRECT_APPEND)
 		{
 			fd = open(redirect->file_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (fd == -1)
-				exit_with_error("minishell: open error");
+				exit_with_error();
 			if (dup2(fd, STDOUT_FILENO) == -1)
-				exit_with_error("minishell: dup2 error");
+				exit_with_error();
 			close(fd);
 		}
 		else if (redirect->type == REDIRECT_HEREDOC)
@@ -60,10 +60,10 @@ int	handle_heredoc(t_redirect *redirect)
 	char	*line;
 
 	if (pipe(pipefd) == -1)
-		exit_with_error("minishell: pipe error");
+		exit_with_error();
 	pid = fork();
 	if (pid == -1)
-		exit_with_error("minishell: fork error");
+		exit_with_error();
 	if (pid == 0)
 	{
 		close(pipefd[0]);
@@ -163,7 +163,7 @@ void	execute_external(char **argv, t_redirect *redirects,
 	}
 	pid = fork();
 	if (pid == -1)
-		exit_with_error("minishell: fork error");
+		exit_with_error();
 	if (!pid)
 	{
 		envp = env_to_envp(env_list);
@@ -177,7 +177,7 @@ void	execute_external(char **argv, t_redirect *redirects,
 		{
 			ft_strarrdel(envp);
 			free(exec_path);
-			exit_with_error("minishell: execve error");
+			exit_with_error();
 		}
 	}
 	waitpid(pid, status, 0);
@@ -204,7 +204,7 @@ void	child_process(t_node *node, t_env *env_list, int *status, int pipefd[2])
 {
 	close(pipefd[0]);
 	if (dup2(pipefd[1], STDOUT_FILENO) == -1)
-		exit_with_error("minishell: dup2 error");
+		exit_with_error();
 	close(pipefd[1]);
 	execute_command(node, env_list, status);
 	exit (*status);
@@ -218,15 +218,15 @@ void	execute_pipeline(t_node *node, t_env *env_list, int *status)
 	if (node->next == NULL)
 		return (execute_command(node, env_list, status));
 	if (pipe(pipefd) == -1)
-		exit_with_error("minishell: pipe error");
+		exit_with_error();
 	parent = fork();
 	if (parent == -1)
-		exit_with_error("minishell: fork error");
+		exit_with_error();
 	if (!parent)
 		child_process(node, env_list, status, pipefd);
 	close(pipefd[1]);
 	if (dup2(pipefd[0], STDIN_FILENO) == -1)
-		exit_with_error("minishell: dup2 error");
+		exit_with_error();
 	close(pipefd[0]);
 	waitpid(parent, status, 0);
 	execute_pipeline(node->next, env_list, status);
@@ -239,10 +239,10 @@ void	execute(t_node *node, t_env *env_list, int *status)
 
 	backup = dup(STDIN_FILENO);
 	if (backup == -1)
-		exit_with_error("minishell: dup error");
+		exit_with_error();
 	execute_pipeline(node, env_list, status);
 	if (dup2(backup, STDIN_FILENO) == -1)
-		exit_with_error("minishell: dup2 error");
+		exit_with_error();
 	close(backup);
 	return ;
 }

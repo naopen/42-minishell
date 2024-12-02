@@ -3,20 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 17:39:54 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/02 11:56:06 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-void	exit_with_error(const char *msg)
-{
-	perror(msg);
-	exit(EXIT_FAILURE);
-}
 
 bool	ft_isnumber(const char *str)
 {
@@ -43,7 +37,7 @@ char	*ft_strndup(const char *s, size_t n)
 		i++;
 	str = (char *)malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
-		exit_with_error("malloc");
+		exit_with_error();
 	ft_strlcpy(str, s, i + 1);
 	return (str);
 }
@@ -61,7 +55,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		len = ft_strlen(s) - (size_t)start;
 	substr = (char *)malloc(sizeof(char) * (len + 1));
 	if (substr == NULL)
-		exit_with_error("malloc");
+		exit_with_error();
 	i = 0;
 	while (i < len)
 	{
@@ -116,7 +110,7 @@ char	**ft_strarradd(char **arr, char *str)
 	len = ft_strarrlen(arr);
 	new_arr = (char **)malloc(sizeof(char *) * (len + 2));
 	if (new_arr == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	i = 0;
 	while (i < len)
 	{
@@ -135,7 +129,7 @@ char	*ft_strjoin_char_free(char *s1, char s2)
 
 	new_str = ft_strjoin(s1, &s2);
 	if (new_str == NULL)
-		exit_with_error("malloc");
+		exit_with_error();
 	free(s1);
 	return (new_str);
 }
@@ -146,7 +140,7 @@ char	*ft_strjoin_free(char *s1, char *s2)
 
 	new_str = ft_strjoin(s1, s2);
 	if (new_str == NULL)
-		exit_with_error("malloc");
+		exit_with_error();
 	free(s1);
 	free(s2);
 	return (new_str);
@@ -158,7 +152,7 @@ char	*ft_strjoin_space_free(char *s1, char *s2)
 
 	new_str = ft_strjoin(s1, " ");
 	if (new_str == NULL)
-		exit_with_error("malloc");
+		exit_with_error();
 	new_str = ft_strjoin_free(new_str, s2);
 	return (new_str);
 }

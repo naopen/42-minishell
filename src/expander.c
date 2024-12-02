@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 23:09:39 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/01 23:49:41 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static char	*expand_variable(char *str, t_env *env_list)
 
 	result = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (result == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	i = 0;
 	j = 0;
 	while (str[i])
@@ -36,7 +36,7 @@ static char	*expand_variable(char *str, t_env *env_list)
 				k++;
 			var_name = ft_strndup(str + i, k);
 			if (var_name == NULL)
-				exit_with_error("minishell: malloc error");
+				exit_with_error();
 			var_value = get_env_value(env_list, var_name);
 			free(var_name);
 			if (var_value)
@@ -61,7 +61,7 @@ static char	*expand_double_quote(char *str)
 
 	result = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (result == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	i = 0;
 	j = 0;
 	while (str[i])
@@ -151,7 +151,7 @@ static char	*get_env_name(const char *str)
 		i++;
 	name = ft_strndup(str, i);
 	if (!name)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	return (name);
 }
 
@@ -165,7 +165,7 @@ char	*expand_env_var(char *str)
 
 	result = ft_strdup("");
 	if (!result)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	i = 0;
 	in_single_quote = 0;
 	while (str[i])
@@ -191,7 +191,7 @@ char	*expand_env_var(char *str)
 		{
 			char *tmp = malloc(ft_strlen(result) + 2);
 			if (!tmp)
-				exit_with_error("minishell: malloc error");
+				exit_with_error();
 			ft_strlcpy(tmp, result, ft_strlen(result) + 1);
 			tmp[ft_strlen(result)] = str[i++];
 			tmp[ft_strlen(result) + 1] = '\0';

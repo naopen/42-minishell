@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/16 16:00:09 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/01 23:47:28 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_env	*create_env_list(char **environ)
 		value = ft_strdup(ft_strchr(*environ, '=') + 1);
 		env = (t_env *)malloc(sizeof(t_env));
 		if (env == NULL)
-			exit_with_error("minishell: malloc error");
+			exit_with_error();
 		env->name = name;
 		env->value = value;
 		env->next = head;
@@ -59,21 +59,21 @@ int	set_env_value(t_env **env_list, const char *name, const char *value)
 			free(env->value);
 			env->value = ft_strdup(value);
 			if (env->value == NULL)
-				exit_with_error("minishell: malloc error");
+				exit_with_error();
 			return (0);
 		}
 		env = env->next;
 	}
 	env = (t_env *)malloc(sizeof(t_env));
 	if (env == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	env->name = ft_strdup(name);
 	env->value = ft_strdup(value);
 	if (env->name == NULL || env->value == NULL)
 	{
 		free(env->name);
 		free(env->value);
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	}
 	env->next = *env_list;
 	*env_list = env;
@@ -143,7 +143,7 @@ char	**env_to_envp(t_env *env_list)
 	}
 	envp = (char **)malloc(sizeof(char *) * (i + 1));
 	if (envp == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	i = 0;
 	env = env_list;
 	while (env)

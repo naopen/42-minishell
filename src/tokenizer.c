@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/27 17:46:37 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 12:06:46 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static t_token	*new_token(t_token_type type, char *word)
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (token == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	token->type = type;
 	token->word = word;
 	token->next = NULL;
@@ -77,19 +77,19 @@ static t_token	*split_token(char **line)
 			if (**line == quote)
 				(*line)++;
 			else
-				exit_with_error("minishell: syntax error: unclosed quote");
+				custum_error("minishell: syntax error: unclosed quote", 1);
 		}
 		else
 			(*line)++;
 	}
 	word = ft_strndup(start, *line - start);
 	if (word == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	token = new_token(get_token_type(word), word);
 	if (token == NULL)
 	{
 		free(word);
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	}
 	return (token);
 }
@@ -102,7 +102,7 @@ static t_token	*split_token_op(char **line)
 
 	op_size = 0;
 	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
-		exit_with_error("Not implement\n");
+		custum_error("Not implement", 1);
 	else if (ft_strncmp(*line, "|", 1) == 0)
 		op_size = 1;
 	else if (ft_strncmp(*line, "<<", 2) == 0)
@@ -114,16 +114,16 @@ static t_token	*split_token_op(char **line)
 	else if (ft_strncmp(*line, ">", 1) == 0)
 		op_size = 1;
 	else
-		exit_with_error("metachar error\n");
+		custum_error("metachar error", 1);
 	word = ft_strndup(*line, op_size);
 	if (word == NULL)
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	(*line) += op_size;
-	token = new_token(TOKEN_OPERATOR, word);
+	token = new_token(get_token_type(word), word);
 	if (token == NULL)
 	{
 		free(word);
-		exit_with_error("minishell: malloc error");
+		exit_with_error();
 	}
 	return (token);
 }
