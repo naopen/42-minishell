@@ -3,93 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <mkaihori@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/01 17:43:43 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/04 17:36:27 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-static int	do_redirection(t_redirect *redirect)
-{
-	int	fd;
-
-	while (redirect)
-	{
-		if (redirect->type == REDIRECT_IN)
-		{
-			fd = open(redirect->file_name, O_RDONLY);
-			if (fd == -1)
-				exit_with_error("minishell: open error");
-			if (dup2(fd, STDIN_FILENO) == -1)
-				exit_with_error("minishell: dup2 error");
-			close(fd);
-		}
-		else if (redirect->type == REDIRECT_OUT)
-		{
-			fd = open(redirect->file_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			if (fd == -1)
-				exit_with_error("minishell: open error");
-			if (dup2(fd, STDOUT_FILENO) == -1)
-				exit_with_error("minishell: dup2 error");
-			close(fd);
-		}
-		else if (redirect->type == REDIRECT_APPEND)
-		{
-			fd = open(redirect->file_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (fd == -1)
-				exit_with_error("minishell: open error");
-			if (dup2(fd, STDOUT_FILENO) == -1)
-				exit_with_error("minishell: dup2 error");
-			close(fd);
-		}
-		else if (redirect->type == REDIRECT_HEREDOC)
-			handle_heredoc(redirect);
-		redirect = redirect->next;
-	}
-	return (0);
-}
-
-int	handle_heredoc(t_redirect *redirect)
-{
-	int		pipefd[2];
-	pid_t	pid;
-	int		status;
-	char	*line;
-
-	if (pipe(pipefd) == -1)
-		exit_with_error("minishell: pipe error");
-	pid = fork();
-	if (pid == -1)
-		exit_with_error("minishell: fork error");
-	if (pid == 0)
-	{
-		close(pipefd[0]);
-		while (1)
-		{
-			line = readline("> ");
-			if (line == NULL || ft_strcmp(line, redirect->file_name) == 0)
-				break ;
-			ft_putendl_fd(line, pipefd[1]);
-			free(line);
-		}
-		close(pipefd[1]);
-		exit(0);
-	}
-	else
-	{
-		close(pipefd[1]);
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		else
-			return (1);
-	}
-}
 
 static char *find_executable(const char *cmd, t_env *env_list)
 {
@@ -146,8 +67,7 @@ static char *find_executable(const char *cmd, t_env *env_list)
     return (NULL);
 }
 
-void	execute_external(char **argv, t_redirect *redirects,
-		t_env *env_list, int *status)
+void	execute_external(t_mini *mini, char **argv, t_env *env_list, int *status)
 {
 	pid_t	pid;
 	char	**envp;
@@ -163,21 +83,15 @@ void	execute_external(char **argv, t_redirect *redirects,
 	}
 	pid = fork();
 	if (pid == -1)
-		exit_with_error("minishell: fork error");
+		system_error(mini);
 	if (!pid)
 	{
-		envp = env_to_envp(env_list);
-		if (do_redirection(redirects) == 1)
-		{
-			ft_strarrdel(envp);
-			free(exec_path);
-			exit(1);
-		}
+		envp = env_to_envp(mini, env_list);
 		if (execve(exec_path, argv, envp) == -1)
 		{
-			ft_strarrdel(envp);
+			system_error(mini);
 			free(exec_path);
-			exit_with_error("minishell: execve error");
+			system_error(mini);
 		}
 	}
 	waitpid(pid, status, 0);
@@ -186,63 +100,146 @@ void	execute_external(char **argv, t_redirect *redirects,
 	return ;
 }
 
-void	execute_command(t_node *node, t_env *env_list, int * status)
+void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int * status)
 {
 	t_builtin_type	builtin_type;
 
 	if (node == NULL)
 		return ;
+
+	do_redirection(mini, node->redirects);
 	builtin_type = get_builtin_type(node->argv[0]);
 	if (builtin_type != BUILTIN_UNKNOWN)
-		execute_builtin(builtin_type, node->argv, &env_list, status);
+		execute_builtin(mini, builtin_type, node->argv, &env_list);
 	else
-		execute_external(node->argv, node->redirects, env_list, status);
+		execute_external(mini, node->argv, env_list, status);
 	return ;
 }
 
-void	child_process(t_node *node, t_env *env_list, int *status, int pipefd[2])
+t_node	*process_command(t_node *node, int p_num)
 {
-	close(pipefd[0]);
-	if (dup2(pipefd[1], STDOUT_FILENO) == -1)
-		exit_with_error("minishell: dup2 error");
-	close(pipefd[1]);
-	execute_command(node, env_list, status);
-	exit (*status);
+	int	i;
+
+	i = 0;
+	while (i < p_num)
+	{
+		node = node->next;
+		i++;
+	}
+	return (node);
 }
 
-void	execute_pipeline(t_node *node, t_env *env_list, int *status)
+void	child_process(t_mini *mini, int pipefd[][2], int process, int p_num)
 {
-	int		pipefd[2];
-	pid_t	parent;
+	int	closer;
 
+	if (p_num > 0)
+	{
+		if (dup2(pipefd[p_num - 1][0], STDIN_FILENO) == -1)
+			system_error(mini);
+	}
+	if (p_num < process - 1)
+	{
+		if (dup2(pipefd[p_num][1], STDOUT_FILENO) == -1)
+			system_error(mini);
+	}
+	closer = 0;
+	while (closer < process - 1)
+	{
+		close(pipefd[closer][0]);
+		close(pipefd[closer][1]);
+		closer++;
+	}
+	execute_command(mini, process_command(mini->node, p_num), mini->env, &(mini->status));
+	exit(mini->status);
+}
+
+void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
+{
+	int	closer;
+
+	closer = 0;
+	while (closer < process - 1)
+	{
+		close(pipefd[closer][0]);
+		close(pipefd[closer][1]);
+		closer++;
+	}
+	closer = 0;
+	while (closer < process)
+		waitpid(pid[closer++], &(mini->status), 0);
+	return ;
+}
+
+void	prepare_pipe(t_mini *mini, int process, int pipefd[][2])
+{
+	int	i;
+
+	i = 0;
+	while (i < process)
+	{
+		if (pipe(pipefd[i]) == -1)
+			system_error(mini);
+		i++;
+	}
+	return ;
+}
+
+void	execute_pipeline(t_mini *mini, t_node *node, int process)
+{
+	int		p_num;
+
+	p_num = 0;
+	prepare_pipe(mini, process - 1, mini->pipefd);
 	if (node->next == NULL)
-		return (execute_command(node, env_list, status));
-	if (pipe(pipefd) == -1)
-		exit_with_error("minishell: pipe error");
-	parent = fork();
-	if (parent == -1)
-		exit_with_error("minishell: fork error");
-	if (!parent)
-		child_process(node, env_list, status, pipefd);
-	close(pipefd[1]);
-	if (dup2(pipefd[0], STDIN_FILENO) == -1)
-		exit_with_error("minishell: dup2 error");
-	close(pipefd[0]);
-	waitpid(parent, status, 0);
-	execute_pipeline(node->next, env_list, status);
+		return (execute_command(mini, node, mini->env, &(mini->status)));
+	while (p_num < process)
+	{
+		if (p_num == process - 1 && get_builtin_type(process_command(node, p_num)->argv[0]) != BUILTIN_UNKNOWN)
+		{
+			execute_builtin(mini, get_builtin_type(process_command(node, p_num)->argv[0]), process_command(node, p_num)->argv, &(mini->env));
+			break ;
+		}
+		mini->pid[p_num] = fork();
+		if (mini->pid[p_num] == -1)
+			system_error(mini);
+		if (!mini->pid[p_num])
+			child_process(mini, mini->pipefd, process, p_num);
+		p_num++;
+	}
+	parent_process(mini, mini->pipefd, process, mini->pid);
 	return ;
 }
 
-void	execute(t_node *node, t_env *env_list, int *status)
+int	count_node(t_node *node)
 {
-	int	backup;
+	int	i;
 
-	backup = dup(STDIN_FILENO);
-	if (backup == -1)
-		exit_with_error("minishell: dup error");
-	execute_pipeline(node, env_list, status);
-	if (dup2(backup, STDIN_FILENO) == -1)
-		exit_with_error("minishell: dup2 error");
-	close(backup);
+	i = 0;
+	while(node)
+	{
+		i++;
+		node = node->next;
+	}
+	return (i);
+}
+
+void	execute(t_mini *mini)
+{
+	mini->process = count_node(mini->node);
+	if (mini->process > 1)
+	{
+		mini->pipefd = malloc(sizeof(int[2]) * (mini->process - 1));
+		if (!mini->pipefd)
+			system_error(mini);
+	}
+	mini->pid = malloc(sizeof(pid_t) * mini->process);
+	if (!mini->pid)
+		system_error(mini);
+	execute_pipeline(mini, mini->node, mini->process);
+	if (dup2(mini->backup_in, STDIN_FILENO) == -1)
+		system_error(mini);
+	if (dup2(mini->backup_out, STDOUT_FILENO) == -1)
+		system_error(mini);
 	return ;
 }

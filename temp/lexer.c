@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:07:38 by nkannan           #+#    #+#             */
-/*   Updated: 2024/08/15 17:36:00 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/02 15:22:13 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_token	*new_token(t_token_kind kind, char *str)
 
 	tok = (t_token *)malloc(sizeof(t_token));
 	if (tok == NULL)
-		exit_with_error("malloc");
+		system_error(mini);
 	tok->kind = kind;
 	tok->str = str;
 	tok->next = NULL;
@@ -98,7 +98,7 @@ t_token	*tokenize(char *line)
 			tok->next = new_token(TK_WORD, ft_strndup(start, line - start));
 		}
 		if (tok->next == NULL)
-			exit_with_error("malloc");
+			system_error(mini);
 		tok = tok->next;
 	}
 	tok->next = new_token(TK_EOF, NULL);

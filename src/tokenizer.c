@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/11/27 17:46:37 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/02 20:31:46 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,30 +27,17 @@ static t_token_type	get_token_type(const char *str)
 	return (TOKEN_WORD);
 }
 
-static t_token	*new_token(t_token_type type, char *word)
+static t_token	*new_token(t_mini *mini, t_token_type type, char *word)
 {
 	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (token == NULL)
-		exit_with_error("minishell: malloc error");
+		system_error(mini);
 	token->type = type;
 	token->word = word;
 	token->next = NULL;
 	return (token);
-}
-
-void	free_token_list(t_token *token_list)
-{
-	t_token	*tmp;
-
-	while (token_list)
-	{
-		tmp = token_list->next;
-		free(token_list->word);
-		free(token_list);
-		token_list = tmp;
-	}
 }
 
 bool	is_quote(char c)
@@ -58,72 +45,111 @@ bool	is_quote(char c)
 	return (c == '\'' || c == '\"');
 }
 
-static t_token	*split_token(char **line)
+char *cut_quote(t_mini *mini, char *word, int single_q, int double_q)
+{
+	int		i;
+	int		j;
+	char	*new;
+
+	i = 0;
+	j = 0;
+	new = (char *)malloc(sizeof(char) * (ft_strlen(word) + 1));
+	if (!new)
+	{
+		free(word);
+		system_error(mini);
+	}
+	while (word[i] != '\0')
+	{
+		if (word[i] == '\'' && !double_q)
+			single_q = !single_q;
+		else if (word[i] == '\"' && !single_q)
+			double_q = !double_q;
+		else
+			new[j++] = word[i];
+		i++;
+	}
+	new[j] = '\0';
+	free(word);
+	return (new);
+}
+
+void	in_quote(t_mini *mini, char **line)
+{
+	char	quote;
+
+	quote = **line;
+	(*line)++;
+	while (**line && **line != quote)
+		(*line)++;
+	if (**line == quote)
+		(*line)++;
+	else
+		custom_error(mini, "minishell: syntax error: unclosed quote", 1);
+	return ;
+}
+
+static t_token	*split_token(t_mini *mini, char **line)
 {
 	t_token	*token;
 	char	*word;
 	char	*start;
-	char	quote;
 
 	start = *line;
 	while (**line && !is_metachar(**line))
 	{
 		if (is_quote(**line))
-		{
-			quote = **line;
-			(*line)++;
-			while (**line && **line != quote)
-				(*line)++;
-			if (**line == quote)
-				(*line)++;
-			else
-				exit_with_error("minishell: syntax error: unclosed quote");
-		}
+			in_quote(mini, line);
 		else
 			(*line)++;
 	}
-	word = ft_strndup(start, *line - start);
+	word = ft_strndup(mini, start, *line - start);
+	word = cut_quote(mini, word, 0, 0);
 	if (word == NULL)
-		exit_with_error("minishell: malloc error");
-	token = new_token(get_token_type(word), word);
+		system_error(mini);
+	token = new_token(mini, get_token_type(word), word);
 	if (token == NULL)
 	{
 		free(word);
-		exit_with_error("minishell: malloc error");
+		system_error(mini);
 	}
 	return (token);
 }
 
-static t_token	*split_token_op(char **line)
+int	get_opsize(t_mini *mini, char **line)
+{
+	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
+		custom_error(mini, "Not implement", 1);
+	else if (ft_strncmp(*line, "|", 1) == 0)
+		return (1);
+	else if (ft_strncmp(*line, "<<", 2) == 0)
+		return (2);
+	else if (ft_strncmp(*line, ">>", 2) == 0)
+		return (2);
+	else if (ft_strncmp(*line, "<", 1) == 0)
+		return (1);
+	else if (ft_strncmp(*line, ">", 1) == 0)
+		return(1);
+	custom_error(mini, "metachar error", 1);
+	exit(0);
+}
+
+static t_token	*split_token_op(t_mini *mini, char **line)
 {
 	t_token	*token;
 	char	*word;
 	int		op_size;
 
-	op_size = 0;
-	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
-		exit_with_error("Not implement\n");
-	else if (ft_strncmp(*line, "|", 1) == 0)
-		op_size = 1;
-	else if (ft_strncmp(*line, "<<", 2) == 0)
-		op_size = 2;
-	else if (ft_strncmp(*line, ">>", 2) == 0)
-		op_size = 2;
-	else if (ft_strncmp(*line, "<", 1) == 0)
-		op_size = 1;
-	else if (ft_strncmp(*line, ">", 1) == 0)
-		op_size = 1;
-	else
-		exit_with_error("metachar error\n");
-	word = ft_strndup(*line, op_size);
+	op_size = get_opsize(mini, line);
+	word = ft_strndup(mini, *line, op_size);
 	if (word == NULL)
-		exit_with_error("minishell: malloc error");
+		system_error(mini);
 	(*line) += op_size;
-	token = new_token(TOKEN_OPERATOR, word);
+	token = new_token(mini, get_token_type(word), word);
 	if (token == NULL)
 	{
 		free(word);
-		exit_with_error("minishell: malloc error");
+		system_error(mini);
 	}
 	return (token);
 }
@@ -143,7 +169,7 @@ static void	add_token_to_list(t_token **head, t_token *token)
 	}
 }
 
-t_token	*tokenize(char *line)
+t_token	*tokenize(t_mini *mini, char *line)
 {
 	t_token	*head;
 	t_token	*token;
@@ -155,16 +181,16 @@ t_token	*tokenize(char *line)
 			line++;
 		if (is_metachar(*line))
 		{
-			token = split_token_op(&line);
+			token = split_token_op(mini, &line);
 			add_token_to_list(&head, token);
 		}
 		else if (!is_metachar(*line))
 		{
-			token = split_token(&line);
+			token = split_token(mini, &line);
 			add_token_to_list(&head, token);
 		}
 	}
-	token = new_token(TOKEN_EOF, NULL);
+	token = new_token(mini, TOKEN_EOF, NULL);
 	add_token_to_list(&head, token);
 	return (head);
 }
