@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 19:53:18 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/04 17:39:05 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,13 @@ void	free_mini(t_mini *mini)
 	if (mini->line)
 		free(mini->line);
 	mini->line = NULL;
+	if (mini->pipefd)
+		free(mini->pipefd);
+	mini->pipefd = NULL;
+	if (mini->pid)
+		free(mini->pid);
+	mini->pid = NULL;
+	mini->process = -1;
 	return ;
 }
 
@@ -122,6 +129,9 @@ t_mini	*get_mini(char **environ)
 	mini->line = NULL;
 	mini->env = create_env_list(mini, environ);
 	mini->status = EXIT_SUCCESS;
+	mini->pipefd = NULL;
+	mini->pid = NULL;
+	mini->process = -1;
 	mini->backup_in = -1;
 	mini->backup_out = -1;
 	mini->backup_in = dup(STDIN_FILENO);

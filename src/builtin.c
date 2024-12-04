@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 20:25:21 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/04 17:29:04 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static bool	is_n_option(const char *str)
 	return (true);
 }
 
-static int	builtin_echo(char **argv, int *status)
+static int	builtin_echo(t_mini *mini, char **argv)
 {
 	int		i;
 	bool	newline;
@@ -51,7 +51,7 @@ static int	builtin_echo(char **argv, int *status)
 	}
 	if (newline)
 		printf("\n");
-	return (*status);
+	return (mini->status);
 }
 
 static int	builtin_cd(char **argv)
@@ -214,10 +214,10 @@ t_builtin_type	get_builtin_type(const char *cmd)
 	return (BUILTIN_UNKNOWN);
 }
 
-int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_list, int *status)
+int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_list)
 {
 	if (type == BUILTIN_ECHO)
-		return (builtin_echo(argv, status));
+		return (builtin_echo(mini, argv));
 	if (type == BUILTIN_CD)
 		return (builtin_cd(argv));
 	if (type == BUILTIN_PWD)
