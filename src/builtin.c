@@ -179,7 +179,7 @@ static int	builtin_env(char **argv, t_env **env_list)
 	return (0);
 }
 
-static int	builtin_exit(char **argv)
+static int	builtin_exit(t_mini *mini, char **argv)
 {
 	int	exit_status;
 
@@ -235,7 +235,7 @@ int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_
 	if (type == BUILTIN_ENV)
 		return (builtin_env(argv, env_list));
 	if (type == BUILTIN_EXIT)
-		return (builtin_exit(argv));
+		return (builtin_exit(mini, argv));
 	return (1);
 
 }
