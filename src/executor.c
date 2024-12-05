@@ -95,8 +95,13 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list, int *status)
 		}
 	}
 	waitpid(pid, status, 0);
-	if (WIFEXITED(*status))
+	if (WIFEXITED(*status)) {
 		*status = WEXITSTATUS(*status);
+		mini->status = *status;
+	} else if (WIFSIGNALED(*status)) {
+		*status = 128 + WTERMSIG(*status);
+		mini->status = *status;
+	}
 	return ;
 }
 
