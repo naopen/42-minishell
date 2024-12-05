@@ -179,7 +179,7 @@ static int	builtin_env(char **argv, t_env **env_list)
 	return (0);
 }
 
-static int	builtin_exit(char **argv)
+static int	builtin_exit(t_mini *mini, char **argv)
 {
 	int	exit_status;
 
@@ -190,6 +190,12 @@ static int	builtin_exit(char **argv)
 		fprintf(stderr, "minishell: exit: %s: numeric argument required\n",
 			argv[1]);
 		exit(255);
+	}
+	if (argv[2] != NULL)
+	{
+		ft_putendl_fd("minishell: exit: too many arguments", STDERR_FILENO);
+		mini->status = 1;
+		return (1);
 	}
 	exit_status = ft_atoi(argv[1]);
 	exit(exit_status);
@@ -229,7 +235,7 @@ int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_
 	if (type == BUILTIN_ENV)
 		return (builtin_env(argv, env_list));
 	if (type == BUILTIN_EXIT)
-		return (builtin_exit(argv));
+		return (builtin_exit(mini, argv));
 	return (1);
 
 }
