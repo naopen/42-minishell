@@ -194,6 +194,7 @@ static int	builtin_exit(char **argv)
 	if (argv[2] != NULL)
 	{
 		ft_putendl_fd("minishell: exit: too many arguments", STDERR_FILENO);
+		mini->status = 1;
 		return (1);
 	}
 	exit_status = ft_atoi(argv[1]);
