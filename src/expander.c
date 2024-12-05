@@ -177,9 +177,11 @@ char	*expand_env_var(t_mini *mini, char *str)
 			i++;
 			if (str[i] == '?')
 			{
-				char status_str[12];
-				snprintf(status_str, sizeof(status_str), "%d", mini->status);
+				char *status_str = ft_itoa(mini->status);
+				if (!status_str)
+					system_error(mini);
 				char *tmp = ft_strjoin(result, status_str);
+				free(status_str);
 				free(result);
 				result = tmp;
 				i++;
