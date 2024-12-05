@@ -20,15 +20,23 @@ static char	*expand_variable(t_mini *mini, char *str, t_env *env_list)
 	size_t	i;
 	size_t	j;
 	size_t	k;
+	bool	in_single_quote;
 
 	result = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (result == NULL)
 		system_error(mini);
 	i = 0;
 	j = 0;
+	in_single_quote = false;
 	while (str[i])
 	{
-		if (str[i] == '$' && str[i + 1] != '\0')
+		if (str[i] == '\'')
+		{
+			in_single_quote = !in_single_quote;
+			result[j++] = str[i++];
+			continue;
+		}
+		if (str[i] == '$' && str[i + 1] != '\0' && !in_single_quote)
 		{
 			i++;
 			k = 0;
@@ -41,7 +49,7 @@ static char	*expand_variable(t_mini *mini, char *str, t_env *env_list)
 			free(var_name);
 			if (var_value)
 			{
-				strcpy(result + j, var_value);
+				ft_strlcpy(result + j, var_value, ft_strlen(var_value) + 1);
 				j += ft_strlen(var_value);
 			}
 			i += k;
