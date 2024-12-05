@@ -172,20 +172,42 @@ char	*expand_env_var(t_mini *mini, char *str)
 	{
 		if (str[i] == '\'')
 			in_single_quote = !in_single_quote;
-		if (str[i] == '$' && !in_single_quote && str[i + 1] &&
-			(ft_isalnum(str[i + 1]) || str[i + 1] == '_'))
+		if (str[i] == '$' && !in_single_quote)
 		{
 			i++;
-			env_name = get_env_name(mini, str + i);
-			env_value = getenv(env_name);
-			if (env_value)
+			if (str[i] == '?')
 			{
-				char *tmp = ft_strjoin(result, env_value);
+				char status_str[12];
+				snprintf(status_str, sizeof(status_str), "%d", mini->status);
+				char *tmp = ft_strjoin(result, status_str);
+				free(result);
+				result = tmp;
+				i++;
+			}
+			else if (ft_isalnum(str[i]) || str[i] == '_')
+			{
+				env_name = get_env_name(mini, str + i);
+				env_value = getenv(env_name);
+				if (env_value)
+				{
+					char *tmp = ft_strjoin(result, env_value);
+					free(result);
+					result = tmp;
+				}
+				i += ft_strlen(env_name);
+				free(env_name);
+			}
+			else
+			{
+				char *tmp = malloc(ft_strlen(result) + 2);
+				if (!tmp)
+					system_error(mini);
+				ft_strlcpy(tmp, result, ft_strlen(result) + 1);
+				tmp[ft_strlen(result)] = '$';
+				tmp[ft_strlen(result) + 1] = '\0';
 				free(result);
 				result = tmp;
 			}
-			i += ft_strlen(env_name);
-			free(env_name);
 		}
 		else
 		{
