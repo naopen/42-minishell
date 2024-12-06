@@ -45,7 +45,7 @@ static int	builtin_echo(t_mini *mini, char **argv)
 	while (argv[i])
 	{
 		printf("%s", argv[i]);
-		if (argv[i + 1])
+		if (argv[i + 1] && argv[i][0] != '\0')
 			printf(" ");
 		i++;
 	}
