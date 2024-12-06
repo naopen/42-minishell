@@ -104,7 +104,7 @@ static t_token	*split_token(t_mini *mini, char **line)
 			(*line)++;
 	}
 	word = ft_strndup(mini, start, *line - start);
-	word = cut_quote(mini, word, 0, 0);
+	// word = cut_quote(mini, word, 0, 0);
 	if (word == NULL)
 		system_error(mini);
 	token = new_token(mini, get_token_type(word), word);

@@ -162,16 +162,30 @@ char	*expand_env_var(t_mini *mini, char *str)
 	char	*env_value;
 	int		i;
 	int		in_single_quote;
+	int		in_double_quote;
 
 	result = ft_strdup("");
 	if (!result)
 		system_error(mini);
 	i = 0;
 	in_single_quote = 0;
+	in_double_quote = 0;
 	while (str[i])
 	{
-		if (str[i] == '\'')
+		if (str[i] == '\"' && !in_single_quote)
+		{
+			in_double_quote = !in_double_quote;
+			i++;
+			if (str[i] == '\0')
+				break ;
+		}
+		if (str[i] == '\'' && !in_double_quote)
+		{
 			in_single_quote = !in_single_quote;
+			i++;
+			if (str[i] == '\0')
+				break ;
+		}
 		if (str[i] == '$' && !in_single_quote)
 		{
 			i++;
