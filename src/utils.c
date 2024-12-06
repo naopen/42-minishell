@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:14:13 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/06 16:37:34 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,23 +107,32 @@ char	**ft_strarradd(t_mini *mini, char **arr, char *str)
 	return (new_arr);
 }
 
-char	*ft_strjoin_char_free(t_mini *mini, char *s1, char s2)
+
+char	*ft_charjoin_free(t_mini *mini, char *s1, char s2)
 {
 	char	*new_str;
+	size_t	len;
 
-	new_str = ft_strjoin(s1, &s2);
-	if (new_str == NULL)
+	if (!s1)
+		return (NULL);
+	len = ft_strlen(s1);
+	new_str = (char *)malloc(sizeof(char) * (len + 2));
+	if (!new_str)
 		system_error(mini);
-	free(s1);
+	ft_strlcpy(new_str, s1, len + 1);
+	new_str[len] = s2;
+	new_str[len + 1] = '\0';
+    free(s1);
 	return (new_str);
 }
+
 
 char	*ft_strjoin_free(t_mini *mini, char *s1, char *s2)
 {
 	char	*new_str;
 
 	new_str = ft_strjoin(s1, s2);
-	if (new_str == NULL)
+	if (!new_str)
 		system_error(mini);
 	free(s1);
 	free(s2);
@@ -132,13 +141,16 @@ char	*ft_strjoin_free(t_mini *mini, char *s1, char *s2)
 
 char	*ft_strjoin_space_free(t_mini *mini, char *s1, char *s2)
 {
-	char	*new_str;
+    char    *tmp;
+    char    *result;
 
-	new_str = ft_strjoin(s1, " ");
-	if (new_str == NULL)
-		system_error(mini);
-	new_str = ft_strjoin_free(mini, new_str, s2);
-	return (new_str);
+    tmp = ft_charjoin_free(mini, s1, ' ');
+    if (!tmp)
+        system_error(mini);
+    result = ft_strjoin_free(mini, tmp, s2);
+    if(!result)
+        system_error(mini);
+    return (result);
 }
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t size)

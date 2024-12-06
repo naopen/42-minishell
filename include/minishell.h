@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/04 17:26:56 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/06 16:37:34 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,9 @@ void			ft_strdel(char **as);
 void			ft_strarrdel(char **arr);
 int				ft_strarrlen(char **arr);
 char			**ft_strarradd(t_mini *mini, char **arr, char *str);
+
+char			*ft_charjoin_free(t_mini *mini, char *s1, char s2);
+char			*ft_strjoin_free(t_mini *mini, char *s1, char *s2);
 
 // tokenizer.c
 t_token			*tokenize(t_mini *mini, char *line);
