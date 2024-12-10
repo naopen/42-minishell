@@ -6,11 +6,12 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 19:29:53 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/10 20:36:57 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include <sys/stat.h>
 
 static char *find_executable(const char *cmd, t_env *env_list)
 {
@@ -69,9 +70,11 @@ static char *find_executable(const char *cmd, t_env *env_list)
 
 void	execute_external(t_mini *mini, char **argv, t_env *env_list, int *status)
 {
-	pid_t	pid;
-	char	**envp;
-	char    *exec_path;
+	pid_t		pid;
+	char		**envp;
+	char		*exec_path;
+	struct stat	st;
+    int         execve_ret; // execveの戻り値を保存
 
 	envp = NULL;
 	exec_path = find_executable(argv[0], env_list);
@@ -87,21 +90,51 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list, int *status)
 	if (!pid)
 	{
 		envp = env_to_envp(mini, env_list);
-		if (execve(exec_path, argv, envp) == -1)
-		{
-			system_error(mini);
-			free(exec_path);
-			system_error(mini);
-		}
+        execve_ret = execve(exec_path, argv, envp); // 戻り値を保存
+		// execveが失敗した場合のみエラーハンドリング
+        if (execve_ret == -1) {
+            if (errno == ENOENT)
+            {
+                // statを使ってENOENTの原因がディレクトリ指定かどうかを判別
+                if (stat(exec_path, &st) == 0 && S_ISDIR(st.st_mode))
+                {
+                    fprintf(stderr, "minishell: %s: Is a directory\n", argv[0]);
+                    exit(126);
+                }
+                else
+                {   // ファイルまたはディレクトリが存在しない場合
+                    if (ft_strchr(argv[0], '/')) { // strchr -> ft_strchr
+                        fprintf(stderr, "minishell: %s: No such file or directory\n", argv[0]);
+                    } else {
+                        fprintf(stderr, "minishell: %s: command not found\n", argv[0]);
+                    }
+                    exit(127);
+                }
+            }
+            else if (errno == EACCES)
+            {
+                fprintf(stderr, "minishell: %s: Permission denied\n", argv[0]);
+                exit(126);
+            }
+            else // その他のエラー
+            {
+                perror("minishell"); // より詳細なエラー表示
+                exit(126); // 126でexit
+            }
+        }
 	}
 	waitpid(pid, status, 0);
-	if (WIFEXITED(*status)) {
+	if (WIFEXITED(*status))
+	{
 		*status = WEXITSTATUS(*status);
 		mini->status = *status;
-	} else if (WIFSIGNALED(*status)) {
+	}
+	else if (WIFSIGNALED(*status))
+	{
 		*status = 128 + WTERMSIG(*status);
 		mini->status = *status;
 	}
+	free(exec_path);
 	return ;
 }
 
