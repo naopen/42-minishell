@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 21:26:11 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/10 21:51:36 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,11 +259,8 @@ void	execute_pipeline(t_mini *mini, t_node *node, int process)
 		return (execute_command(mini, node, mini->env, &(mini->status)));
 	while (p_num < process)
 	{
-		if (p_num == process - 1 && get_builtin_type(process_command(node, p_num)->argv[0]) != BUILTIN_UNKNOWN)
-		{
-			execute_builtin(mini, get_builtin_type(process_command(node, p_num)->argv[0]), process_command(node, p_num)->argv, &(mini->env));
-			break ;
-		}
+		// 以前はここで「最後がビルトインかどうか」を判断し、ビルトインなら親で直接execute_builtinをしていた。
+		// これを削除し、常にforkして子プロセスで実行。
 		mini->pid[p_num] = fork();
 		if (mini->pid[p_num] == -1)
 			system_error(mini);
@@ -274,6 +271,7 @@ void	execute_pipeline(t_mini *mini, t_node *node, int process)
 	parent_process(mini, mini->pipefd, process, mini->pid);
 	return ;
 }
+
 
 int	count_node(t_node *node)
 {
