@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/04 17:36:27 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/10 19:06:30 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,11 +115,15 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int * status)
 	do_redirection(mini, node->redirects);
 	builtin_type = get_builtin_type(node->argv[0]);
 	if (builtin_type != BUILTIN_UNKNOWN)
-		execute_builtin(mini, builtin_type, node->argv, &env_list);
+		mini->status = execute_builtin(mini, builtin_type, node->argv, &env_list);
 	else
+	{
 		execute_external(mini, node->argv, env_list, status);
+		mini->status = *status;
+	}
 	return ;
 }
+
 
 t_node	*process_command(t_node *node, int p_num)
 {
