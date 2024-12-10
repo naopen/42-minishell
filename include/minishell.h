@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/04 17:26:56 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 01:01:52 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,5 +160,6 @@ void			custom_error(t_mini *mini, char *msg, int error);
 int				do_redirection(t_mini *mini, t_redirect *redirect);
 int				finish_mini(t_mini *mini);
 void			free_node(t_node *node);
+void			print_error(char *msg);
 
 #endif

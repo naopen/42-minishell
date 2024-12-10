@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 22:03:25 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/11 01:02:25 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,11 @@ static int	builtin_cd(char **argv)
 	}
 	else
 	{
+		if (argv[2] != NULL)
+		{
+			print_error(" too many arguments");
+			return (1);
+		}
 		if (chdir(argv[1]) == -1)
 		{
 			perror("cd");
