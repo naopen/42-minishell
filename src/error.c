@@ -9,16 +9,19 @@ void	system_error(t_mini *mini)
 
 void	syntax_error(t_mini *mini, t_token *token)
 {
-	if (dup2(STDERR_FILENO, STDOUT_FILENO) == - 1)
-		system_error(mini);
+	char *unexpected;
+
 	if (token->type == TOKEN_EOF)
-		printf("syntax error near unexpected token `newline'\n");
+		unexpected = "newline";
 	else
-		printf("syntax error near unexpected token `%c'\n", token->word[0]);
-	if (dup2(mini->backup_out, STDOUT_FILENO) == -1)
-		system_error(mini);
+		unexpected = token->word;
+
+	fprintf(stderr, "bash: line 1: syntax error near unexpected token `%s'\n", unexpected);
+	fprintf(stderr, "bash: line 1: `%s'\n", mini->line);
+
+	mini->status = 2;
 	finish_mini(mini);
-	exit(258) ;
+	exit(2);
 }
 
 void	custom_error(t_mini *mini, char *msg, int error)
