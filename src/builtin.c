@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 19:06:43 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/10 22:03:25 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,10 +176,11 @@ static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 static int	builtin_unset(char **argv, t_env **env_list)
 {
 	if (argv[1] == NULL)
-		return (1);
+		return (0);
 	unset_env_value(env_list, argv[1]);
 	return (0);
 }
+
 
 static int	builtin_env(char **argv, t_env **env_list)
 {
