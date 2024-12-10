@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 19:25:31 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/10 19:29:53 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,6 @@ void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
 	int	closer;
 	int	raw_status;
 
-	// パイプクローズ
 	closer = 0;
 	while (closer < process - 1)
 	{
@@ -177,7 +176,6 @@ void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
 		closer++;
 	}
 
-	// 子プロセスの終了待ちとステータス更新
 	closer = 0;
 	while (closer < process)
 	{
@@ -187,7 +185,7 @@ void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
 		else if (WIFSIGNALED(raw_status))
 			mini->status = 128 + WTERMSIG(raw_status);
 		else
-			mini->status = raw_status; // 想定外だが保険的処理
+			mini->status = raw_status;
 		closer++;
 	}
 	return ;
