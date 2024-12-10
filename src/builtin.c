@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/04 17:29:04 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/10 19:06:43 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,31 +91,40 @@ static int	builtin_pwd(char **argv)
 
 static bool	is_valid_identifier(t_mini *mini, const char *str)
 {
-	const char	*name;
-	char		*equals_pos;
+	char	*equals_pos;
+	char	*name;
+	int		i;
 
 	if (!str || !*str)
 		return (false);
-	
 	equals_pos = ft_strchr(str, '=');
 	if (equals_pos)
 		name = ft_strndup(mini, str, equals_pos - str);
 	else
-		name = str;
-
-	if (!ft_isalpha(*name) && *name != '_')
-		return (false);
-	
-	while (*++name && (equals_pos ? name < equals_pos : true))
 	{
-		if (!ft_isalnum(*name) && *name != '_')
-			return (false);
+		name = ft_strdup(str);
+		if (!name)
+			system_error(mini);
 	}
-	
-	if (equals_pos)
-		free((char *)name);
+	if (!ft_isalpha(name[0]) && name[0] != '_')
+	{
+		free(name);
+		return (false);
+	}
+	i = 1;
+	while (name[i])
+	{
+		if (!ft_isalnum(name[i]) && name[i] != '_')
+		{
+			free(name);
+			return (false);
+		}
+		i++;
+	}
+	free(name);
 	return (true);
 }
+
 
 static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 {
