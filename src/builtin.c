@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 01:02:25 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 01:07:47 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,7 @@ static int	builtin_exit(t_mini *mini, char **argv)
 	{
 		fprintf(stderr, "minishell: exit: %s: numeric argument required\n",
 			argv[1]);
-		exit(255);
+		exit(2);
 	}
 	if (argv[2] != NULL)
 	{
