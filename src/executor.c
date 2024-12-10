@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 19:06:30 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/10 19:29:53 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,7 @@ void	child_process(t_mini *mini, int pipefd[][2], int process, int p_num)
 void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
 {
 	int	closer;
+	int	raw_status;
 
 	closer = 0;
 	while (closer < process - 1)
@@ -174,11 +175,22 @@ void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
 		close(pipefd[closer][1]);
 		closer++;
 	}
+
 	closer = 0;
 	while (closer < process)
-		waitpid(pid[closer++], &(mini->status), 0);
+	{
+		waitpid(pid[closer], &raw_status, 0);
+		if (WIFEXITED(raw_status))
+			mini->status = WEXITSTATUS(raw_status);
+		else if (WIFSIGNALED(raw_status))
+			mini->status = 128 + WTERMSIG(raw_status);
+		else
+			mini->status = raw_status;
+		closer++;
+	}
 	return ;
 }
+
 
 void	prepare_pipe(t_mini *mini, int process, int pipefd[][2])
 {
