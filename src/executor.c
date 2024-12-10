@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 20:36:57 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/10 21:26:11 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,14 +138,23 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list, int *status)
 	return ;
 }
 
-void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int * status)
+void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status)
 {
 	t_builtin_type	builtin_type;
+	int				ret;
 
 	if (node == NULL)
 		return ;
 
-	do_redirection(mini, node->redirects);
+	// リダイレクト処理結果チェックを追加
+	ret = do_redirection(mini, node->redirects);
+	if (ret != 0)
+	{
+		// リダイレクト失敗時はコマンド実行せず終了ステータスを反映
+		*status = mini->status;
+		return;
+	}
+
 	builtin_type = get_builtin_type(node->argv[0]);
 	if (builtin_type != BUILTIN_UNKNOWN)
 		mini->status = execute_builtin(mini, builtin_type, node->argv, &env_list);
@@ -156,6 +165,7 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int * status)
 	}
 	return ;
 }
+
 
 
 t_node	*process_command(t_node *node, int p_num)
