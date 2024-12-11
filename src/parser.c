@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 20:29:51 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 11:02:49 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,35 @@ static void	add_redirect_to_list(t_redirect **head, t_redirect *redirect)
 	return ;
 }
 
+char *cut_quote(t_mini *mini, char *word, int single_q, int double_q)
+{
+	int		i;
+	int		j;
+	char	*new;
+
+	i = 0;
+	j = 0;
+	new = (char *)malloc(sizeof(char) * (ft_strlen(word) + 1));
+	if (!new)
+	{
+		free(word);
+		system_error(mini);
+	}
+	while (word[i] != '\0')
+	{
+		if (word[i] == '\'' && !double_q)
+			single_q = !single_q;
+		else if (word[i] == '\"' && !single_q)
+			double_q = !double_q;
+		else
+			new[j++] = word[i];
+		i++;
+	}
+	new[j] = '\0';
+	free(word);
+	return (new);
+}
+
 char	*get_filename(t_mini *mini, t_token *token)
 {
 	char	*filename;
@@ -102,7 +131,10 @@ char	*get_filename(t_mini *mini, t_token *token)
 	if (token->type == TOKEN_EOF || is_metachar(token->word[0]))
 		syntax_error(mini, token);
 	else
+	{
+		token->word = cut_quote(mini, token->word, 0, 0);
 		filename = ft_strdup(token->word);
+	}
 	return (filename);
 }
 

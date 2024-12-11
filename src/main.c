@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/05 18:21:44 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/11 11:05:57 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,35 +30,35 @@
 // 	return ;
 // }
 
-// void	print_node(t_node *node)
-// {
-// 	int			i;
-// 	t_redirect	*temp;
+void	print_node(t_node *node)
+{
+	int			i;
+	t_redirect	*temp;
 
-// 	i = 0;
-// 	printf("=====node debug=====\n");
-// 	while (node)
-// 	{
-// 		printf("node type : %d\n", node->type);
-// 		while (node->argv[i])
-// 		{
-// 			printf("node argv %d: %s\n", i + 1, node->argv[i]);
-// 			i++;
-// 		}
-// 		i = 0;
-// 		temp = node->redirects;
-// 		while (temp)
-// 		{
-// 			printf("redirects type : %d\n", temp->type);
-// 			printf("redirects filename : %s\n", temp->file_name);
-// 			temp = temp->next;
-// 		}
-// 		node = node->next;
-// 		printf("\n");
-// 	}
-// 	printf("=====node debug=====\n");
-// 	return ;
-// }
+	i = 0;
+	printf("=====node debug=====\n");
+	while (node)
+	{
+		printf("node type : %d\n", node->type);
+		while (node->argv[i])
+		{
+			printf("node argv %d: %s\n", i + 1, node->argv[i]);
+			i++;
+		}
+		i = 0;
+		temp = node->redirects;
+		while (temp)
+		{
+			printf("redirects type : %d\n", temp->type);
+			printf("redirects filename : %s\n", temp->file_name);
+			temp = temp->next;
+		}
+		node = node->next;
+		printf("\n");
+	}
+	printf("=====node debug=====\n");
+	return ;
+}
 
 void	print_env(t_env *env)
 {
