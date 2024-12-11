@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 23:22:00 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 00:33:07 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,8 @@ char	*expand_env_var(t_mini *mini, char *str)
 			free(result);
 			result = tmp;
 		}
-		i++;
+		if (str[i] != '\0')
+			i++;
 	}
 	free(str);
 	return (result);
