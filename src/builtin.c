@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 01:07:47 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 11:38:44 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,8 @@ static int	builtin_exit(t_mini *mini, char **argv)
 
 t_builtin_type	get_builtin_type(const char *cmd)
 {
+	if (!cmd)
+		return (BUILTIN_UNKNOWN);
 	if (ft_strcmp(cmd, "echo") == 0)
 		return (BUILTIN_ECHO);
 	if (ft_strcmp(cmd, "cd") == 0)
