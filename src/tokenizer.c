@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 11:04:45 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 18:35:15 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,8 @@ int	get_opsize(t_mini *mini, char **line)
 		return (1);
 	else if (ft_strncmp(*line, ">", 1) == 0)
 		return(1);
-	custom_error(mini, "metachar error", 1);
+	else
+		custom_error(mini, "metachar error", 1);
 	exit(0);
 }
 
@@ -150,12 +151,12 @@ t_token	*tokenize(t_mini *mini, char *line)
 	{
 		while (*line == ' ' || *line == '\t')
 			line++;
-		if (is_metachar(*line))
+		if (*line && is_metachar(*line))
 		{
 			token = split_token_op(mini, &line);
 			add_token_to_list(&head, token);
 		}
-		else if (!is_metachar(*line))
+		else if (*line && !is_metachar(*line))
 		{
 			token = split_token(mini, &line);
 			add_token_to_list(&head, token);

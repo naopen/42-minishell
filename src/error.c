@@ -24,16 +24,22 @@ void	syntax_error(t_mini *mini, t_token *token)
 	exit(2);
 }
 
-void	print_error(char *msg)
+void	print_error(t_mini *mini, char *msg)
 {
-	write(STDERR_FILENO, msg, ft_strlen(msg));
-	write(STDERR_FILENO, "\n", 1);
+	if (dup2(STDERR_FILENO, STDOUT_FILENO) == -1)
+		system_error(mini);
+	printf("%s\n", msg);
+	if (dup2(mini->backup_out, STDOUT_FILENO) == -1)
+		system_error(mini);
+	// (void)mini;
+	// write(STDERR_FILENO, msg, ft_strlen(msg));
+	// write(STDERR_FILENO, "\n", 1);
 	return ;
 }
 
 void	custom_error(t_mini *mini, char *msg, int error)
 {
-	print_error(msg);
+	print_error(mini, msg);
 	finish_mini(mini);
 	exit(error);
 }
