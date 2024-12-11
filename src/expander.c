@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:11:10 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/10 23:22:00 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,20 +173,10 @@ char	*expand_env_var(t_mini *mini, char *str)
 	while (str[i])
 	{
 		if (str[i] == '\"' && !in_single_quote)
-		{
 			in_double_quote = !in_double_quote;
-			i++;
-			if (str[i] == '\0')
-				break ;
-		}
-		if (str[i] == '\'' && !in_double_quote)
-		{
+		else if (str[i] == '\'' && !in_double_quote)
 			in_single_quote = !in_single_quote;
-			i++;
-			if (str[i] == '\0')
-				break ;
-		}
-		if (str[i] == '$' && !in_single_quote)
+		else if (str[i] == '$' && !in_single_quote)
 		{
 			i++;
 			if (str[i] == '?')
@@ -198,7 +188,6 @@ char	*expand_env_var(t_mini *mini, char *str)
 				free(status_str);
 				free(result);
 				result = tmp;
-				i++;
 			}
 			else if (ft_isalnum(str[i]) || str[i] == '_')
 			{
@@ -210,7 +199,8 @@ char	*expand_env_var(t_mini *mini, char *str)
 					free(result);
 					result = tmp;
 				}
-				i += ft_strlen(env_name);
+				if (ft_strlen(env_name))
+					i += ft_strlen(env_name) - 1;
 				free(env_name);
 			}
 			else
@@ -231,11 +221,12 @@ char	*expand_env_var(t_mini *mini, char *str)
 			if (!tmp)
 				system_error(mini);
 			ft_strlcpy(tmp, result, ft_strlen(result) + 1);
-			tmp[ft_strlen(result)] = str[i++];
+			tmp[ft_strlen(result)] = str[i];
 			tmp[ft_strlen(result) + 1] = '\0';
 			free(result);
 			result = tmp;
 		}
+		i++;
 	}
 	free(str);
 	return (result);
