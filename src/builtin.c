@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 11:38:44 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/11 11:48:41 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int	builtin_echo(t_mini *mini, char **argv)
 	return (mini->status);
 }
 
-static int	builtin_cd(char **argv)
+static int	builtin_cd(t_mini *mini, char **argv)
 {
 	if (argv[1] == NULL)
 	{
@@ -68,7 +68,7 @@ static int	builtin_cd(char **argv)
 	{
 		if (argv[2] != NULL)
 		{
-			print_error(" too many arguments");
+			print_error(mini, " too many arguments");
 			return (1);
 		}
 		if (chdir(argv[1]) == -1)
@@ -242,7 +242,7 @@ int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_
 	if (type == BUILTIN_ECHO)
 		return (builtin_echo(mini, argv));
 	if (type == BUILTIN_CD)
-		return (builtin_cd(argv));
+		return (builtin_cd(mini, argv));
 	if (type == BUILTIN_PWD)
 		return (builtin_pwd(argv));
 	if (type == BUILTIN_EXPORT)
