@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/10 21:51:36 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/11 11:37:56 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,10 +142,11 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status)
 {
 	t_builtin_type	builtin_type;
 	int				ret;
+	int				i;
 
 	if (node == NULL)
 		return ;
-
+	i = 0;
 	// リダイレクト処理結果チェックを追加
 	ret = do_redirection(mini, node->redirects);
 	if (ret != 0)
@@ -154,13 +155,14 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status)
 		*status = mini->status;
 		return;
 	}
-
-	builtin_type = get_builtin_type(node->argv[0]);
+	while (node->argv[i] && node->argv[i][0] == '\0')
+		i++;
+	builtin_type = get_builtin_type(node->argv[i]);
 	if (builtin_type != BUILTIN_UNKNOWN)
-		mini->status = execute_builtin(mini, builtin_type, node->argv, &env_list);
-	else
+		mini->status = execute_builtin(mini, builtin_type, node->argv + i, &env_list);
+	else if (node->argv[i])
 	{
-		execute_external(mini, node->argv, env_list, status);
+		execute_external(mini, node->argv + i, env_list, status);
 		mini->status = *status;
 	}
 	return ;
