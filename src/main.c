@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/13 12:49:55 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/13 17:59:22 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,20 @@ void	handle_sigint(int sig)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
+}
+
+void setup_signal_handlers(void)
+{
+    if (signal(SIGINT, handle_sigint) == SIG_ERR)
+    {
+        perror("signal");
+        exit(1);
+    }
+    if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+    {
+        perror("signal");
+        exit(1);
+    }
 }
 
 void	free_mini(t_mini *mini)
@@ -172,7 +186,7 @@ int	main(int argc, char **argv, char **environ)
 	(void)argc;
 	(void)argv;
 	mini = get_mini(environ);
-	signal(SIGINT, handle_sigint);
+	setup_signal_handlers();
 	while (1)
 	{
 		mini->line = readline("> ");
