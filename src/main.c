@@ -6,11 +6,13 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 15:18:45 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/13 12:49:55 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+volatile sig_atomic_t	g_cntl_c = 0;
 
 // void	print_token(t_token *token)
 // {
@@ -74,6 +76,7 @@ void	print_env(t_env *env)
 void	handle_sigint(int sig)
 {
 	(void)sig;
+	g_cntl_c = 1;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -177,12 +180,15 @@ int	main(int argc, char **argv, char **environ)
 			break ;
 		if (*(mini->line) != '\0')
 		{
+			if (g_cntl_c)
+				mini->status = g_cntl_c;
 			add_history(mini->line);
 			mini->token = tokenize(mini, mini->line);
 			mini->node = parse(mini, &(mini->token));
 			execute(mini);
 			free_mini(mini);
 		}
+		g_cntl_c = 0;
 	}
 	return (finish_mini(mini));
 }
