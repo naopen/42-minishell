@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 12:37:06 by mkaihori          #+#    #+#             */
-/*   Updated: 2024/12/13 18:57:41 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/13 19:26:18 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,9 @@ void handle_heredoc_input(t_mini *mini, t_redirect *redirect, int write_fd)
 
 int handle_heredoc(t_mini *mini, t_redirect *redirect)
 {
-    int     pipefd[2];
-    pid_t   pid;
-    int     status;
+    int pipefd[2];
+    pid_t pid;
+    int status;
 
     if (pipe(pipefd) == -1)
         system_error(mini);
@@ -75,11 +75,9 @@ int handle_heredoc(t_mini *mini, t_redirect *redirect)
         system_error(mini);
     else if (pid == 0) // 子プロセス
     {
-        setup_heredoc_signal_handlers(); // heredoc 中のシグナル設定
+        setup_heredoc_signal_handlers(); // heredoc中のシグナル設定
         close(pipefd[0]); // 読み取り側を閉じる
-        handle_heredoc_input(mini, redirect, pipefd[1]); // 実際のheredoc処理
-        close(pipefd[1]);
-        exit(0); // 正常終了
+        handle_heredoc_input(mini, redirect, pipefd[1]); // 入力処理
     }
     else // 親プロセス
     {
@@ -88,22 +86,24 @@ int handle_heredoc(t_mini *mini, t_redirect *redirect)
 
         if (WIFSIGNALED(status)) // シグナルで終了した場合
         {
-            if (WTERMSIG(status) == SIGINT) // CTRL+C が押された
+            if (WTERMSIG(status) == SIGINT) // SIGINT を検出
             {
-                mini->status = 130; // シェルのステータスコード設定
+                mini->status = 130;
                 close(pipefd[0]);
-                return -1; // エラーを返す
+                return -1;
             }
-            // SIGQUIT の場合は無視されるので、ここには来ない
+            else if (WTERMSIG(status) == SIGQUIT) // SIGQUIT を無視
+            {
+                mini->status = 131; // 必要に応じてコードを設定
+                close(pipefd[0]);
+                return -1;
+            }
         }
         if (WEXITSTATUS(status) != 0)
         {
             close(pipefd[0]);
-            return -1; // heredoc 処理が異常終了した場合
+            return -1;
         }
     }
-
-    redirect->file_name = HEREDOC_TMPFILE;
-    redirect->next = NULL;
-    return pipefd[0]; // heredoc の出力用ファイルディスクリプタを返す
+    return pipefd[0]; // 読み取り用のファイルディスクリプタを返す
 }
