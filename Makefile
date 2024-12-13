@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+         #
+#    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/12/02 16:41:17 by mkaihori         ###   ########.fr        #
+#    Updated: 2024/12/13 18:52:38 by nkannan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,8 @@ SRCS = main.c \
 	   error.c \
 	   redirect.c \
 	   heredoc.c \
-	   free.c 
+	   free.c \
+	   signal.c
 
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
