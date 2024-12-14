@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 11:37:56 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/13 18:47:23 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,27 +185,30 @@ t_node	*process_command(t_node *node, int p_num)
 
 void	child_process(t_mini *mini, int pipefd[][2], int process, int p_num)
 {
-	int	closer;
+    int	closer;
 
-	if (p_num > 0)
-	{
-		if (dup2(pipefd[p_num - 1][0], STDIN_FILENO) == -1)
-			system_error(mini);
-	}
-	if (p_num < process - 1)
-	{
-		if (dup2(pipefd[p_num][1], STDOUT_FILENO) == -1)
-			system_error(mini);
-	}
-	closer = 0;
-	while (closer < process - 1)
-	{
-		close(pipefd[closer][0]);
-		close(pipefd[closer][1]);
-		closer++;
-	}
-	execute_command(mini, process_command(mini->node, p_num), mini->env, &(mini->status));
-	exit(mini->status);
+    // 子プロセス用シグナルハンドラ設定
+    setup_child_signal_handlers();
+
+    if (p_num > 0)
+    {
+        if (dup2(pipefd[p_num - 1][0], STDIN_FILENO) == -1)
+            system_error(mini);
+    }
+    if (p_num < process - 1)
+    {
+        if (dup2(pipefd[p_num][1], STDOUT_FILENO) == -1)
+            system_error(mini);
+    }
+    closer = 0;
+    while (closer < process - 1)
+    {
+        close(pipefd[closer][0]);
+        close(pipefd[closer][1]);
+        closer++;
+    }
+    execute_command(mini, process_command(mini->node, p_num), mini->env, &(mini->status));
+    exit(mini->status);
 }
 
 void	parent_process(t_mini *mini, int pipefd[][2], int process, int pid[])
@@ -253,25 +256,30 @@ void	prepare_pipe(t_mini *mini, int process, int pipefd[][2])
 
 void	execute_pipeline(t_mini *mini, t_node *node, int process)
 {
-	int		p_num;
+    int		p_num;
 
-	p_num = 0;
-	prepare_pipe(mini, process - 1, mini->pipefd);
-	if (node->next == NULL)
-		return (execute_command(mini, node, mini->env, &(mini->status)));
-	while (p_num < process)
-	{
-		// 以前はここで「最後がビルトインかどうか」を判断し、ビルトインなら親で直接execute_builtinをしていた。
-		// これを削除し、常にforkして子プロセスで実行。
-		mini->pid[p_num] = fork();
-		if (mini->pid[p_num] == -1)
-			system_error(mini);
-		if (!mini->pid[p_num])
-			child_process(mini, mini->pipefd, process, p_num);
-		p_num++;
-	}
-	parent_process(mini, mini->pipefd, process, mini->pid);
-	return ;
+    // 親プロセス用シグナルハンドラ設定
+    if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+    {
+        perror("signal");
+        exit(1);
+    }
+
+    p_num = 0;
+    prepare_pipe(mini, process - 1, mini->pipefd);
+    if (node->next == NULL)
+        return (execute_command(mini, node, mini->env, &(mini->status)));
+    while (p_num < process)
+    {
+        mini->pid[p_num] = fork();
+        if (mini->pid[p_num] == -1)
+            system_error(mini);
+        if (!mini->pid[p_num])
+            child_process(mini, mini->pipefd, process, p_num);
+        p_num++;
+    }
+    parent_process(mini, mini->pipefd, process, mini->pid);
+    return ;
 }
 
 

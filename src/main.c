@@ -6,13 +6,13 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/13 17:59:22 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/13 19:02:09 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-volatile sig_atomic_t	g_cntl_c = 0;
+volatile sig_atomic_t g_cntl_c = 0;
 
 // void	print_token(t_token *token)
 // {
@@ -71,30 +71,6 @@ void	print_env(t_env *env)
 		env = env->next;
 	}
 	return ;
-}
-
-void	handle_sigint(int sig)
-{
-	(void)sig;
-	g_cntl_c = 1;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void setup_signal_handlers(void)
-{
-    if (signal(SIGINT, handle_sigint) == SIG_ERR)
-    {
-        perror("signal");
-        exit(1);
-    }
-    if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
-    {
-        perror("signal");
-        exit(1);
-    }
 }
 
 void	free_mini(t_mini *mini)

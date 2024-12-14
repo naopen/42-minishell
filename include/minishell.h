@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 11:48:09 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/13 19:00:42 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,9 @@ typedef struct s_mini
 	int				status;
 }	t_mini;
 
-// utils.c
+extern volatile sig_atomic_t	g_cntl_c;
 
+// utils.c
 void			system_error(t_mini *mini);
 bool			ft_isnumber(const char *str);
 char			*ft_strndup(t_mini *mini, const char *s, size_t n);
@@ -120,25 +121,6 @@ void			ft_strdel(char **as);
 void			ft_strarrdel(char **arr);
 int				ft_strarrlen(char **arr);
 char			**ft_strarradd(t_mini *mini, char **arr, char *str);
-
-// tokenizer.c
-t_token			*tokenize(t_mini *mini, char *line);
-void			free_token_list(t_token *token_list);
-bool			is_quote(char c);
-
-// tokennizer_utils.c
-bool			is_metachar(char c);
-
-// parser.c
-t_node			*parse(t_mini *mini, t_token **token_list);
-
-// expander.c
-void			expand(t_mini *mini, t_node *node, t_env *env_list);
-char			*expand_env_var(t_mini *mini, char *str);
-
-// executor.c
-void			execute(t_mini *mini);
-int				handle_heredoc(t_mini *mini, t_redirect *redirect);
 
 // builtin.c
 t_builtin_type	get_builtin_type(const char *cmd);
@@ -161,5 +143,31 @@ int				do_redirection(t_mini *mini, t_redirect *redirect);
 int				finish_mini(t_mini *mini);
 void			free_node(t_node *node);
 void			print_error(t_mini *mini, char *msg);
+
+// executor.c
+void			execute(t_mini *mini);
+int				handle_heredoc(t_mini *mini, t_redirect *redirect);
+
+// expander.c
+void			expand(t_mini *mini, t_node *node, t_env *env_list);
+char			*expand_env_var(t_mini *mini, char *str);
+
+// parser.c
+t_node			*parse(t_mini *mini, t_token **token_list);
+
+// signal.c
+void			handle_sigint(int sig);
+void			setup_signal_handlers(void);
+void			setup_child_signal_handlers(void);
+void 			handle_heredoc_sigint(int sig);
+void 			setup_heredoc_signal_handlers(void);
+
+// tokenizer.c
+t_token			*tokenize(t_mini *mini, char *line);
+void			free_token_list(t_token *token_list);
+bool			is_quote(char c);
+
+// tokennizer_utils.c
+bool			is_metachar(char c);
 
 #endif
