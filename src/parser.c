@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:09:41 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:18:20 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ char	*get_filename(t_mini *mini, t_token *token)
 	else
 	{
 		token->word = cut_quote(mini, token->word, 0, 0);
-		filename = ft_strdup(token->word);
+		filename = expand_env_var(mini, ft_strdup(token->word));;
 	}
 	return (filename);
 }
