@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 16:01:07 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:43:38 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,11 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status)
 	{
 		execute_external(mini, node->argv + i, env_list, status);
 		mini->status = *status;
+	}
+	else if (!node->argv[i])
+	{
+		print_error(mini, "bash: : command not found\n", NULL);
+		mini->status = 127;
 	}
 	return ;
 }
