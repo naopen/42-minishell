@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:18:20 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:22:27 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static char	**get_command_args(t_mini *mini, t_token **token_list, int argc)
 	if (!strs)
 		system_error(mini);
 	argc = 0;
-	while (token->type != TOKEN_OPERATOR && token->type != TOKEN_EOF)
+	while (token && token->type != TOKEN_OPERATOR && token->type != TOKEN_EOF)
 	{
 		if (token->type != TOKEN_WORD)
 			token = token->next->next;

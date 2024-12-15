@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 16:03:10 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:26:21 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static int	builtin_cd(t_mini *mini, char **argv)
 	{
 		if (argv[2] != NULL)
 		{
-			print_error(mini, " too many arguments");
+			print_error(mini, " too many arguments", NULL);
 			return (1);
 		}
 		if (chdir(argv[1]) == -1)
