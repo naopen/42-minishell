@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:10:05 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:12:41 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,6 @@ int	main(int argc, char **argv, char **environ)
 				mini->status = g_cntl_c;
 			add_history(mini->line);
 			mini->token = tokenize(mini, mini->line);
-			mini->token_head = mini->token;
 			mini->node = parse(mini, &(mini->token));
 			execute(mini);
 			free_mini(mini);

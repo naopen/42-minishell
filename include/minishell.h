@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:06:54 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:12:50 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,6 @@ typedef enum e_builtin_type
 typedef struct s_mini
 {
 	struct s_token	*token;
-	struct s_token	*token_head;
 	struct s_node	*node;
 	struct s_env	*env;
 	char			*line;
