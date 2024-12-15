@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/13 12:52:03 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 16:03:10 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,11 @@ static bool	is_valid_identifier(t_mini *mini, const char *str)
 		return (false);
 	equals_pos = ft_strchr(str, '=');
 	if (equals_pos)
+	{
 		name = ft_strndup(mini, str, equals_pos - str);
+		if (!name)
+			system_error(mini);
+	}
 	else
 	{
 		name = ft_strdup(str);
@@ -161,16 +165,14 @@ static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 
 		equals_pos = ft_strchr(argv[i], '=');
 		if (!equals_pos)
-		{
-			set_env_value(mini, env_list, argv[i], "");
-		}
+			set_env_value(mini, argv[i], "");
 		else
 		{
 			name = ft_strndup(mini, argv[i], equals_pos - argv[i]);
 			if (!name)
-				return (1);
+				system_error(mini);
 			value = equals_pos + 1;
-			set_env_value(mini, env_list, name, value);
+			set_env_value(mini, name, value);
 			free(name);
 		}
 		i++;
