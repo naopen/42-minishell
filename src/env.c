@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:33:25 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:42:57 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	add_env_list(t_env **head, t_env *new)
 {
-	t_env *tmp;
+	t_env	*tmp;
 
 	if (*head == NULL)
 	{

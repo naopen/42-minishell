@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 18:35:15 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:43:38 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ static t_token	*split_token(t_mini *mini, char **line)
 			(*line)++;
 	}
 	word = ft_strndup(mini, start, *line - start);
-	// word = cut_quote(mini, word, 0, 0);
 	if (word == NULL)
 		system_error(mini);
 	token = new_token(mini, get_token_type(word), word);
@@ -100,7 +99,7 @@ int	get_opsize(t_mini *mini, char **line)
 	else if (ft_strncmp(*line, "<", 1) == 0)
 		return (1);
 	else if (ft_strncmp(*line, ">", 1) == 0)
-		return(1);
+		return (1);
 	else
 		custom_error(mini, "metachar error", 1);
 	exit(0);
