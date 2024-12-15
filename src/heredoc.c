@@ -6,104 +6,94 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 12:37:06 by mkaihori          #+#    #+#             */
-/*   Updated: 2024/12/13 19:26:18 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/15 18:53:59 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	write_heredoc(int pipefd[2], t_redirect *red)
+void	write_heredoc_to_tmpfile(t_redirect *redirect)
 {
+	int		tmpfile_fd;
 	char	*line;
 
-	close(pipefd[0]);
+	unlink(HEREDOC_TMPFILE);
+	tmpfile_fd = open(HEREDOC_TMPFILE, O_CREAT | O_WRONLY | O_TRUNC, 0600);
+	if (tmpfile_fd == -1)
+	{
+		perror("heredoc: failed to create temporary file");
+		exit(1);
+	}
 	while (1)
 	{
-		line = readline("> ");
-		if (line == NULL || ft_strcmp(line, red->file_name) == 0)
+		line = readline("heredoc> ");
+		if (line == NULL || ft_strcmp(line, redirect->file_name) == 0)
 		{
 			free(line);
 			break ;
 		}
-		ft_putendl_fd(line, pipefd[1]);
+		ft_putendl_fd(line, tmpfile_fd);
 		free(line);
 	}
-	close(pipefd[1]);
-	exit(0);
+	close(tmpfile_fd);
 }
 
-void handle_heredoc_input(t_mini *mini, t_redirect *redirect, int write_fd)
+int	handle_heredoc(t_mini *mini, t_redirect *redirect)
 {
-    (void)mini;     // 未使用であることを明示
-    (void)redirect; // 未使用であることを明示
+	pid_t	pid;
+	int		status;
+	int		tmpfile_fd;
 
-    char *line;
+	pid = fork();
+	if (pid == -1)
+		system_error(mini);
+	else if (pid == 0) // 子プロセス
+	{
+		setup_heredoc_signal_handlers();
+		write_heredoc_to_tmpfile(redirect);
+		exit(0);
+	}
+	else // 親プロセス
+	{
+		waitpid(pid, &status, 0); // 子プロセスの終了を待つ
+		if (WIFSIGNALED(status))  // シグナルで終了した場合
+		{
+			if (WTERMSIG(status) == SIGINT) // SIGINT を検出
+			{
+				mini->status = 130;
+				return (-1);
+			}
+			else if (WTERMSIG(status) == SIGQUIT) // SIGQUIT を無視
+			{
+				mini->status = 131;
+				return (-1);
+			}
+		}
+		if (WEXITSTATUS(status) != 0)
+			return (-1);
+		// temporary file を開く
+		tmpfile_fd = open(HEREDOC_TMPFILE, O_RDONLY);
+		if (tmpfile_fd == -1)
+		{
+			perror("heredoc: failed to open temporary file");
+			exit(1);
+		}
 
-    while (1)
-    {
-        line = readline("> "); // ユーザー入力を取得
-        if (line == NULL) // EOFの場合
-        {
-            write(STDOUT_FILENO, "\n", 1);
-            break;
-        }
-        if (strcmp(line, redirect->file_name) == 0) // delimiter と一致
-        {
-            free(line);
-            break;
-        }
-        write(write_fd, line, strlen(line)); // 入力内容をパイプに書き込み
-        write(write_fd, "\n", 1);            // 改行を追加
-        free(line);
-    }
-    close(write_fd); // 書き込みを終了
-    exit(0);         // 正常終了
-}
+		// 標準入力にリダイレクト
+		if (dup2(tmpfile_fd, STDIN_FILENO) == -1)
+		{
+			perror("heredoc: failed to redirect standard input");
+			close(tmpfile_fd);
+			exit(1);
+		}
+		close(tmpfile_fd);
 
+		// リダイレクト先をテンポラリファイルに設定
+		redirect->file_name = ft_strdup(HEREDOC_TMPFILE);
+		if (!redirect->file_name)
+			system_error(mini);
 
-int handle_heredoc(t_mini *mini, t_redirect *redirect)
-{
-    int pipefd[2];
-    pid_t pid;
-    int status;
-
-    if (pipe(pipefd) == -1)
-        system_error(mini);
-
-    pid = fork();
-    if (pid == -1)
-        system_error(mini);
-    else if (pid == 0) // 子プロセス
-    {
-        setup_heredoc_signal_handlers(); // heredoc中のシグナル設定
-        close(pipefd[0]); // 読み取り側を閉じる
-        handle_heredoc_input(mini, redirect, pipefd[1]); // 入力処理
-    }
-    else // 親プロセス
-    {
-        close(pipefd[1]); // 書き込み側を閉じる
-        waitpid(pid, &status, 0); // 子プロセスの終了を待つ
-
-        if (WIFSIGNALED(status)) // シグナルで終了した場合
-        {
-            if (WTERMSIG(status) == SIGINT) // SIGINT を検出
-            {
-                mini->status = 130;
-                close(pipefd[0]);
-                return -1;
-            }
-            else if (WTERMSIG(status) == SIGQUIT) // SIGQUIT を無視
-            {
-                mini->status = 131; // 必要に応じてコードを設定
-                close(pipefd[0]);
-                return -1;
-            }
-        }
-        if (WEXITSTATUS(status) != 0)
-        {
-            close(pipefd[0]);
-            return -1;
-        }
-    }
-    return pipefd[0]; // 読み取り用のファイルディスクリプタを返す
+		return (0);
+	}
+	return (0);
 }
