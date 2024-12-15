@@ -15,31 +15,28 @@ void	syntax_error(t_mini *mini, t_token *token)
 		unexpected = "newline";
 	else
 		unexpected = token->word;
-
-	fprintf(stderr, "bash: line 1: syntax error near unexpected token `%s'\n", unexpected);
-	fprintf(stderr, "bash: line 1: `%s'\n", mini->line);
-
+	print_error(mini, "bash: line 1: syntax error near unexpected token `%s'\n", unexpected);
+	print_error(mini, "bash: line 1: `%s'\n", mini->line);
 	mini->status = 2;
-	finish_mini(mini);
-	exit(2);
+	return ;
 }
 
-void	print_error(t_mini *mini, char *msg)
+void	print_error(t_mini *mini, char *msg, char *arg)
 {
 	if (dup2(STDERR_FILENO, STDOUT_FILENO) == -1)
 		system_error(mini);
-	printf("%s\n", msg);
+	if (arg)
+		printf(msg, arg);
+	else
+		printf("%s", msg);
 	if (dup2(mini->backup_out, STDOUT_FILENO) == -1)
 		system_error(mini);
-	// (void)mini;
-	// write(STDERR_FILENO, msg, ft_strlen(msg));
-	// write(STDERR_FILENO, "\n", 1);
 	return ;
 }
 
 void	custom_error(t_mini *mini, char *msg, int error)
 {
-	print_error(mini, msg);
+	print_error(mini, msg, NULL);
 	finish_mini(mini);
 	exit(error);
 }

@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 16:03:10 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:30:48 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static int	builtin_cd(t_mini *mini, char **argv)
 	{
 		if (argv[2] != NULL)
 		{
-			print_error(mini, " too many arguments");
+			print_error(mini, " too many arguments", NULL);
 			return (1);
 		}
 		if (chdir(argv[1]) == -1)
@@ -145,7 +145,7 @@ static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 
 	if (argv[1] == NULL)
 	{
-		print_env_list(*env_list);
+		print_env_list(*env_list, 1);
 		return (0);
 	}
 
@@ -192,7 +192,7 @@ static int	builtin_unset(char **argv, t_env **env_list)
 static int	builtin_env(char **argv, t_env **env_list)
 {
 	(void)argv;
-	print_env_list(*env_list);
+	print_env_list(*env_list, 0);
 	return (0);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 17:41:24 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/15 19:33:25 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,12 +121,17 @@ void	unset_env_value(t_env **env_list, const char *name)
 	}
 }
 
-void	print_env_list(t_env *env_list)
+void	print_env_list(t_env *env_list, int flag)
 {
 	while (env_list)
 	{
-		printf("declare -x ");
-		printf("%s=\"%s\"\n", env_list->name, env_list->value);
+		if (flag)
+		{
+			printf("declare -x ");
+			printf("%s=\"%s\"\n", env_list->name, env_list->value);
+		}
+		else
+			printf("%s=%s\n", env_list->name, env_list->value);
 		env_list = env_list->next;
 	}
 }

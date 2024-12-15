@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 16:14:00 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 19:31:26 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ t_env			*create_env_list(t_mini *mini, char **environ);
 char			*get_env_value(t_env *env_list, const char *name);
 int				set_env_value(t_mini *mini, const char *name, const char *value);
 void			unset_env_value(t_env **env_list, const char *name);
-void			print_env_list(t_env *env_list);
+void			print_env_list(t_env *env_list, int flag);
 void			free_env(t_env *env);
 char			**env_to_envp(t_mini *mini, t_env *env_list);
 
@@ -141,7 +141,7 @@ void			custom_error(t_mini *mini, char *msg, int error);
 int				do_redirection(t_mini *mini, t_redirect *redirect);
 int				finish_mini(t_mini *mini);
 void			free_node(t_node *node);
-void			print_error(t_mini *mini, char *msg);
+void			print_error(t_mini *mini, char *msg, char *arg);
 
 // executor.c
 void			execute(t_mini *mini);
