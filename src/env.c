@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 16:14:22 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 16:19:59 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ void	print_env_list(t_env *env_list)
 {
 	while (env_list)
 	{
+		printf("declare -x ");
 		printf("%s=%s\n", env_list->name, env_list->value);
 		env_list = env_list->next;
 	}
