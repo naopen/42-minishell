@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:22:27 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:43:30 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,33 +51,6 @@ static char	**get_command_args(t_mini *mini, t_token **token_list, int argc)
 	return (strs);
 }
 
-// static t_redirect	*parse_redirect(t_token **token_list)
-// {
-// 	t_redirect	*redirect;
-
-// 	redirect = (t_redirect *)malloc(sizeof(t_redirect));
-// 	if (redirect == NULL)
-// 		system_error(mini);
-// 	if ((*token_list)->type == TOKEN_REDIRECT_IN)
-// 		redirect->type = REDIRECT_IN;
-// 	else if ((*token_list)->type == TOKEN_REDIRECT_OUT)
-// 		redirect->type = REDIRECT_OUT;
-// 	else if ((*token_list)->type == TOKEN_REDIRECT_APPEND)
-// 		redirect->type = REDIRECT_APPEND;
-// 	else if ((*token_list)->type == TOKEN_HEREDOC)
-// 	{
-// 		redirect->type = REDIRECT_HEREDOC;
-// 		*token_list = (*token_list)->next;
-// 		if (*token_list == NULL || (*token_list)->type != TOKEN_WORD)
-// 			custom_error("minishell: syntax error: heredoc delimiter not found", 1);
-// 		redirect->file_name = (*token_list)->word;
-// 	}
-// 	else
-// 		custom_error("minishell: syntax error: invalid redirect", 1);
-// 	*token_list = (*token_list)->next;
-// 	return (redirect);
-// }
-
 static void	add_redirect_to_list(t_redirect **head, t_redirect *redirect)
 {
 	t_redirect	*tmp;
@@ -94,7 +67,7 @@ static void	add_redirect_to_list(t_redirect **head, t_redirect *redirect)
 	return ;
 }
 
-char *cut_quote(t_mini *mini, char *word, int single_q, int double_q)
+char	*cut_quote(t_mini *mini, char *word, int single_q, int double_q)
 {
 	int		i;
 	int		j;
@@ -133,7 +106,7 @@ char	*get_filename(t_mini *mini, t_token *token)
 	else
 	{
 		token->word = cut_quote(mini, token->word, 0, 0);
-		filename = expand_env_var(mini, ft_strdup(token->word));;
+		filename = expand_env_var(mini, ft_strdup(token->word));
 	}
 	return (filename);
 }

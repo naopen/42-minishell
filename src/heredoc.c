@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 12:37:06 by mkaihori          #+#    #+#             */
-/*   Updated: 2024/12/15 18:53:59 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/15 21:43:25 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,23 +47,23 @@ int	handle_heredoc(t_mini *mini, t_redirect *redirect)
 	pid = fork();
 	if (pid == -1)
 		system_error(mini);
-	else if (pid == 0) // 子プロセス
+	else if (pid == 0)
 	{
 		setup_heredoc_signal_handlers();
 		write_heredoc_to_tmpfile(redirect);
 		exit(0);
 	}
-	else // 親プロセス
+	else
 	{
-		waitpid(pid, &status, 0); // 子プロセスの終了を待つ
-		if (WIFSIGNALED(status))  // シグナルで終了した場合
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status))
 		{
-			if (WTERMSIG(status) == SIGINT) // SIGINT を検出
+			if (WTERMSIG(status) == SIGINT)
 			{
 				mini->status = 130;
 				return (-1);
 			}
-			else if (WTERMSIG(status) == SIGQUIT) // SIGQUIT を無視
+			else if (WTERMSIG(status) == SIGQUIT)
 			{
 				mini->status = 131;
 				return (-1);
@@ -71,15 +71,12 @@ int	handle_heredoc(t_mini *mini, t_redirect *redirect)
 		}
 		if (WEXITSTATUS(status) != 0)
 			return (-1);
-		// temporary file を開く
 		tmpfile_fd = open(HEREDOC_TMPFILE, O_RDONLY);
 		if (tmpfile_fd == -1)
 		{
 			perror("heredoc: failed to open temporary file");
 			exit(1);
 		}
-
-		// 標準入力にリダイレクト
 		if (dup2(tmpfile_fd, STDIN_FILENO) == -1)
 		{
 			perror("heredoc: failed to redirect standard input");
@@ -87,12 +84,9 @@ int	handle_heredoc(t_mini *mini, t_redirect *redirect)
 			exit(1);
 		}
 		close(tmpfile_fd);
-
-		// リダイレクト先をテンポラリファイルに設定
 		redirect->file_name = ft_strdup(HEREDOC_TMPFILE);
 		if (!redirect->file_name)
 			system_error(mini);
-
 		return (0);
 	}
 	return (0);

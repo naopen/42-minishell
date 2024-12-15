@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 16:08:58 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:43:23 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,10 +181,10 @@ char	*expand_env_var(t_mini *mini, char *str)
 			i++;
 			if (str[i] == '?')
 			{
-				char *status_str = ft_itoa(mini->status);
+				char	*status_str = ft_itoa(mini->status);
 				if (!status_str)
 					system_error(mini);
-				char *tmp = ft_strjoin(result, status_str);
+				char	*tmp = ft_strjoin(result, status_str);
 				free(status_str);
 				free(result);
 				result = tmp;
@@ -195,7 +195,7 @@ char	*expand_env_var(t_mini *mini, char *str)
 				env_value = get_env(mini, env_name);
 				if (env_value)
 				{
-					char *tmp = ft_strjoin(result, env_value);
+					char	*tmp = ft_strjoin(result, env_value);
 					free(result);
 					result = tmp;
 				}
@@ -205,7 +205,7 @@ char	*expand_env_var(t_mini *mini, char *str)
 			}
 			else
 			{
-				char *tmp = malloc(ft_strlen(result) + 2);
+				char	*tmp = malloc(ft_strlen(result) + 2);
 				if (!tmp)
 					system_error(mini);
 				ft_strlcpy(tmp, result, ft_strlen(result) + 1);
@@ -217,7 +217,7 @@ char	*expand_env_var(t_mini *mini, char *str)
 		}
 		else
 		{
-			char *tmp = malloc(ft_strlen(result) + 2);
+			char	*tmp = malloc(ft_strlen(result) + 2);
 			if (!tmp)
 				system_error(mini);
 			ft_strlcpy(tmp, result, ft_strlen(result) + 1);

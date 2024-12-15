@@ -3,34 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:12:41 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:43:27 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-volatile sig_atomic_t g_cntl_c = 0;
-
-// void	print_token(t_token *token)
-// {
-// 	int	index;
-
-// 	index = 1;
-// 	printf("-----debug-----\n");
-// 	while (token->type != TOKEN_EOF)
-// 	{
-// 		printf("token%d\n", index);
-// 		printf("token type : %d\n", token->type);
-// 		printf("token word : %s\n\n", token->word);
-// 		token = token->next;
-// 		index++;
-// 	}
-// 	printf("-----debug-----\n");
-// 	return ;
-// }
+volatile sig_atomic_t	g_cntl_c = 0;
 
 void	print_node(t_node *node)
 {

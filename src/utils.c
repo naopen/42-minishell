@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 16:14:13 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:43:41 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,6 @@ char	*ft_strtok(char *str, const char *delim)
 		last = NULL;
 	return (start);
 }
-
 
 // int	ft_fnmatch(const char *pattern, const char *string, int flags)
 // {

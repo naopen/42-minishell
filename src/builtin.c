@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:30:48 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 21:42:46 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,6 @@ static bool	is_valid_identifier(t_mini *mini, const char *str)
 	return (true);
 }
 
-
 static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 {
 	char	*equals_pos;
@@ -148,7 +147,6 @@ static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 		print_env_list(*env_list, 1);
 		return (0);
 	}
-
 	status = 0;
 	i = 1;
 	while (argv[i])
@@ -160,9 +158,8 @@ static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
 			ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
 			status = 1;
 			i++;
-			continue;
+			continue ;
 		}
-
 		equals_pos = ft_strchr(argv[i], '=');
 		if (!equals_pos)
 			set_env_value(mini, argv[i], "");
@@ -187,7 +184,6 @@ static int	builtin_unset(char **argv, t_env **env_list)
 	unset_env_value(env_list, argv[1]);
 	return (0);
 }
-
 
 static int	builtin_env(char **argv, t_env **env_list)
 {
@@ -256,5 +252,4 @@ int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_
 	if (type == BUILTIN_EXIT)
 		return (builtin_exit(mini, argv));
 	return (1);
-
 }

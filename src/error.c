@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   error.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/15 21:43:04 by nkannan           #+#    #+#             */
+/*   Updated: 2024/12/15 21:43:07 by nkannan          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minishell.h"
 
 void	system_error(t_mini *mini)
@@ -9,7 +21,7 @@ void	system_error(t_mini *mini)
 
 void	syntax_error(t_mini *mini, t_token *token)
 {
-	char *unexpected;
+	char	*unexpected;
 
 	if (token->type == TOKEN_EOF)
 		unexpected = "newline";

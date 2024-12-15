@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 20:03:35 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/15 21:42:51 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,8 @@ int				execute_builtin(t_mini *mini, t_builtin_type type, char **argv,
 // env.c
 t_env			*create_env_list(t_mini *mini, char **environ);
 char			*get_env_value(t_env *env_list, const char *name);
-int				set_env_value(t_mini *mini, const char *name, const char *value);
+int				set_env_value(t_mini *mini, const char *name, \
+					const char *value);
 void			unset_env_value(t_env **env_list, const char *name);
 void			print_env_list(t_env *env_list, int flag);
 void			free_env(t_env *env);
@@ -163,8 +164,8 @@ t_node			*parse(t_mini *mini, t_token **token_list);
 void			handle_sigint(int sig);
 void			setup_signal_handlers(void);
 void			setup_child_signal_handlers(void);
-void 			handle_heredoc_sigint(int sig);
-void 			setup_heredoc_signal_handlers(void);
+void			handle_heredoc_sigint(int sig);
+void			setup_heredoc_signal_handlers(void);
 
 // tokenizer.c
 t_token			*tokenize(t_mini *mini, char *line);
