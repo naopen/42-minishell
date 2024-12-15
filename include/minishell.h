@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 19:31:26 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 20:03:35 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@
 # include <errno.h>
 # include <signal.h>
 # include <sys/wait.h>
+
+# include <unistd.h>
+# ifdef __linux__
+#  include <linux/limits.h>
+# endif
 
 # define SYNTAX_ERROR 1
 # define ERROR_OPEN_REDIR 2
