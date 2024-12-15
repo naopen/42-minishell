@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/02 18:56:13 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 16:14:22 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,11 @@ char	*get_env_value(t_env *env_list, const char *name)
 	return (NULL);
 }
 
-int	set_env_value(t_mini *mini, t_env **env_list, const char *name, const char *value)
+int	set_env_value(t_mini *mini, const char *name, const char *value)
 {
 	t_env	*env;
 
-	env = *env_list;
+	env = mini->env;
 	while (env)
 	{
 		if (ft_strcmp(env->name, name) == 0)
@@ -91,8 +91,8 @@ int	set_env_value(t_mini *mini, t_env **env_list, const char *name, const char *
 		free(env->value);
 		system_error(mini);
 	}
-	env->next = *env_list;
-	*env_list = env;
+	env->next = mini->env;
+	mini->env = env;
 	return (0);
 }
 
@@ -157,4 +157,18 @@ char	**env_to_envp(t_mini *mini, t_env *env_list)
 	}
 	envp[i] = NULL;
 	return (envp);
+}
+
+char	*get_env(t_mini *mini, char *env_name)
+{
+	t_env	*tmp;
+
+	tmp = mini->env;
+	while (tmp)
+	{
+		if (ft_strcmp(tmp->name, env_name) == 0)
+			return (tmp->value);
+		tmp = tmp->next;
+	}
+	return (NULL);
 }

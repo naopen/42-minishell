@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/13 19:00:42 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/15 16:14:00 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,8 +130,7 @@ int				execute_builtin(t_mini *mini, t_builtin_type type, char **argv,
 // env.c
 t_env			*create_env_list(t_mini *mini, char **environ);
 char			*get_env_value(t_env *env_list, const char *name);
-int				set_env_value(t_mini *mini, t_env **env_list,
-					const char *name, const char *value);
+int				set_env_value(t_mini *mini, const char *name, const char *value);
 void			unset_env_value(t_env **env_list, const char *name);
 void			print_env_list(t_env *env_list);
 void			free_env(t_env *env);
@@ -169,5 +168,6 @@ bool			is_quote(char c);
 
 // tokennizer_utils.c
 bool			is_metachar(char c);
+char			*get_env(t_mini *mini, char *env_name);
 
 #endif

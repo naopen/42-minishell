@@ -6,7 +6,7 @@
 /*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:48 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/11 00:33:07 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/15 16:08:58 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,7 @@ char	*expand_env_var(t_mini *mini, char *str)
 			else if (ft_isalnum(str[i]) || str[i] == '_')
 			{
 				env_name = get_env_name(mini, str + i);
-				env_value = getenv(env_name);
+				env_value = get_env(mini, env_name);
 				if (env_value)
 				{
 					char *tmp = ft_strjoin(result, env_value);
