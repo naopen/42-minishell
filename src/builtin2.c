@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 13:45:04 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 13:49:31 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:05:28 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	builtin_exit(t_mini *mini, char **argv)
 		exit(0);
 	if (ft_isnumber(argv[1]) == false)
 	{
-		fprintf(stderr, "minishell: exit: %s: numeric argument required\n",
+		print_error(mini, "minishell: exit: %s: numeric argument required\n",
 			argv[1]);
 		exit(2);
 	}
