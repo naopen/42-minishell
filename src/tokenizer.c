@@ -6,13 +6,13 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 17:09:19 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 21:43:38 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:12:51 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static t_token_type	get_token_type(const char *str)
+t_token_type	get_token_type(const char *str)
 {
 	if (ft_strcmp(str, "<") == 0)
 		return (TOKEN_REDIRECT_IN);
@@ -27,7 +27,7 @@ static t_token_type	get_token_type(const char *str)
 	return (TOKEN_WORD);
 }
 
-static t_token	*new_token(t_mini *mini, t_token_type type, char *word)
+t_token	*new_token(t_mini *mini, t_token_type type, char *word)
 {
 	t_token	*token;
 
@@ -40,27 +40,7 @@ static t_token	*new_token(t_mini *mini, t_token_type type, char *word)
 	return (token);
 }
 
-bool	is_quote(char c)
-{
-	return (c == '\'' || c == '\"');
-}
-
-void	in_quote(t_mini *mini, char **line)
-{
-	char	quote;
-
-	quote = **line;
-	(*line)++;
-	while (**line && **line != quote)
-		(*line)++;
-	if (**line == quote)
-		(*line)++;
-	else
-		custom_error(mini, "minishell: syntax error: unclosed quote", 1);
-	return ;
-}
-
-static t_token	*split_token(t_mini *mini, char **line)
+t_token	*split_token(t_mini *mini, char **line)
 {
 	t_token	*token;
 	char	*word;
@@ -84,60 +64,6 @@ static t_token	*split_token(t_mini *mini, char **line)
 		system_error(mini);
 	}
 	return (token);
-}
-
-int	get_opsize(t_mini *mini, char **line)
-{
-	if (ft_strncmp(*line, "||", 2) == 0 || ft_strncmp(*line, "<<<", 3) == 0)
-		custom_error(mini, "Not implement", 1);
-	else if (ft_strncmp(*line, "|", 1) == 0)
-		return (1);
-	else if (ft_strncmp(*line, "<<", 2) == 0)
-		return (2);
-	else if (ft_strncmp(*line, ">>", 2) == 0)
-		return (2);
-	else if (ft_strncmp(*line, "<", 1) == 0)
-		return (1);
-	else if (ft_strncmp(*line, ">", 1) == 0)
-		return (1);
-	else
-		custom_error(mini, "metachar error", 1);
-	exit(0);
-}
-
-static t_token	*split_token_op(t_mini *mini, char **line)
-{
-	t_token	*token;
-	char	*word;
-	int		op_size;
-
-	op_size = get_opsize(mini, line);
-	word = ft_strndup(mini, *line, op_size);
-	if (word == NULL)
-		system_error(mini);
-	(*line) += op_size;
-	token = new_token(mini, get_token_type(word), word);
-	if (token == NULL)
-	{
-		free(word);
-		system_error(mini);
-	}
-	return (token);
-}
-
-static void	add_token_to_list(t_token **head, t_token *token)
-{
-	t_token	*tmp;
-
-	if (*head == NULL)
-		*head = token;
-	else
-	{
-		tmp = *head;
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = token;
-	}
 }
 
 t_token	*tokenize(t_mini *mini, char *line)

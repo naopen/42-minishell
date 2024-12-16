@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 21:42:51 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:08:30 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,17 @@ void			expand(t_mini *mini, t_node *node, t_env *env_list);
 char			*expand_env_var(t_mini *mini, char *str);
 
 // parser.c
+t_node			*new_node(t_mini *mini, t_node_type type);
+char			*get_filename(t_mini *mini, t_token *token);
+void			add_redirect(t_mini *mini, t_node *node, t_token **token_list);
+t_node			*parse_process(t_mini *mini, t_token **token_list);
 t_node			*parse(t_mini *mini, t_token **token_list);
+
+// parser2.c
+char			**get_command_args(t_mini *mini, t_token **token_list, int argc);
+void			add_redirect_to_list(t_redirect **head, t_redirect *red);
+char			*cut_quote(t_mini *mini, char *word, int single_q, int double_q);
+
 
 // signal.c
 void			handle_sigint(int sig);
@@ -168,12 +178,24 @@ void			handle_heredoc_sigint(int sig);
 void			setup_heredoc_signal_handlers(void);
 
 // tokenizer.c
+t_token_type	get_token_type(const char *str);
+t_token			*new_token(t_mini *mini, t_token_type type, char *word);
+t_token			*split_token(t_mini *mini, char **line);
 t_token			*tokenize(t_mini *mini, char *line);
 void			free_token_list(t_token *token_list);
 bool			is_quote(char c);
 
+// tokenizer2.c
+
+int				get_opsize(t_mini *mini, char **line);
+t_token			*split_token_op(t_mini *mini, char **line);
+void			add_token_to_list(t_token **head, t_token *token);
+
+
 // tokennizer_utils.c
 bool			is_metachar(char c);
+bool			is_redirect(char c);
+void			in_quote(t_mini *mini, char **line);
 char			*get_env(t_mini *mini, char *env_name);
 
 #endif

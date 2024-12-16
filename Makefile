@@ -6,7 +6,7 @@
 #    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/12/13 18:52:38 by nkannan          ###   ########.fr        #
+#    Updated: 2024/12/16 12:13:58 by nkannan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,9 @@ INC_DIR = includes
 
 SRCS = main.c \
        tokenizer.c \
+	   tokenizer2.c \
        parser.c \
+	   parser2.c \
        expander.c \
        executor.c \
        builtin.c \
