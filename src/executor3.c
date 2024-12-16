@@ -6,18 +6,18 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:29:03 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 15:35:22 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:17:27 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	handle_command_not_found(char *argv0)
+void	handle_command_not_found(char *argv0, t_mini *mini)
 {
 	if (ft_strchr(argv0, '/'))
-		fprintf(stderr, "minishell: %s: No such file or directory\n", argv0);
+		print_error(mini, "minishell: %s: No such file or directory\n", argv0);
 	else
-		fprintf(stderr, "minishell: %s: command not found\n", argv0);
+		print_error(mini, "minishell: %s: command not found\n", argv0);
 }
 
 void	update_status(t_mini *mini, int *status)

@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 15:50:59 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:16:48 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,25 @@
 #include <sys/stat.h>
 
 static void	child_process(char **argv, char **envp, char *exec_path,
-		int *status)
+		t_mini *mini)
 {
 	struct stat	st;
 
-	(void)status;
 	if (execve(exec_path, argv, envp) == -1)
 	{
 		if (errno == ENOENT)
 		{
 			if (stat(exec_path, &st) == 0 && S_ISDIR(st.st_mode))
 			{
-				fprintf(stderr, "minishell: %s: Is a directory\n", argv[0]);
+				print_error(mini, "minishell: %s: Is a directory\n", argv[0]);
 				exit(126);
 			}
-			handle_command_not_found(argv[0]);
+			handle_command_not_found(argv[0], mini);
 			exit(127);
 		}
 		else if (errno == EACCES)
 		{
-			fprintf(stderr, "minishell: %s: Permission denied\n", argv[0]);
+			print_error(mini, "minishell: %s: Permission denied\n", argv[0]);
 			exit(126);
 		}
 		perror("minishell");
@@ -52,7 +51,7 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list,
 	exec_path = find_executable(argv[0], env_list);
 	if (!exec_path)
 	{
-		fprintf(stderr, "minishell: %s: command not found\n", argv[0]);
+		print_error(mini, "minishell: %s: command not found\n", argv[0]);
 		*status = 127;
 		return ;
 	}
@@ -62,7 +61,7 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list,
 	if (!pid)
 	{
 		envp = env_to_envp(mini, env_list);
-		child_process(argv, envp, exec_path, status);
+		child_process(argv, envp, exec_path, mini);
 	}
 	waitpid(pid, status, 0);
 	update_status(mini, status);
