@@ -27,7 +27,8 @@ void	syntax_error(t_mini *mini, t_token *token)
 		unexpected = "newline";
 	else
 		unexpected = token->word;
-	print_error(mini, "bash: line 1: syntax error near unexpected token `%s'\n", unexpected);
+	print_error(mini, "bash: line 1: syntax error near unexpected token `%s'\n",
+		unexpected);
 	print_error(mini, "bash: line 1: `%s'\n", mini->line);
 	mini->status = 2;
 	return ;
