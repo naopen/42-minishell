@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
+#    By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/12/16 14:03:04 by nkannan          ###   ########.fr        #
+#    Updated: 2024/12/16 15:43:27 by mkaihori         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,8 @@ SRCS = main.c \
        parser.c \
 	   parser2.c \
        expander.c \
+	   expander2.c \
+	   expander3.c \
        executor.c \
 	   executor2.c \
        builtin.c \
