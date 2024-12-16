@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 14:06:03 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:54:00 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,14 +139,11 @@ int								builtin_env(char **argv, t_env **env_list);
 int								builtin_pwd(char **argv);
 int								builtin_exit(t_mini *mini, char **argv);
 
-
-
 // builtin3.c
 bool							is_valid_identifier(t_mini *mini,
 									const char *str);
 int								builtin_export(t_mini *mini, char **argv,
 									t_env **env_list);
-
 
 // env.c
 t_env							*create_env_list(t_mini *mini, char **environ);
@@ -171,22 +168,39 @@ void							print_error(t_mini *mini, char *msg, char *arg);
 
 // env2.c
 char							*get_env(t_mini *mini, char *env_name);
-void							unset_env_value(t_env **env_list, const char *name);
+void							unset_env_value(t_env **env_list,
+									const char *name);
 void							print_env_list(t_env *env_list, int flag);
 
+// env3.c
+void							add_env_list(t_env **head, t_env *new);
+t_env							*create_env_list(t_mini *mini, char **environ);
+
+// error.c
+int								print_redirect_error(t_mini *mini,
+									char *filename);
 
 // executor.c
 void							execute(t_mini *mini);
 int								handle_heredoc(t_mini *mini,
 									t_redirect *redirect);
 t_node							*process_command(t_node *node, int p_num);
-void							execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status);
-
+void							execute_command(t_mini *mini, t_node *node,
+									t_env *env_list, int *status);
 
 // executor2.c
 void							execute_pipeline(t_mini *mini, t_node *node,
 									int process);
 int								count_node(t_node *node);
+
+// executor3.c
+void							handle_command_not_found(char *argv0);
+void							update_status(t_mini *mini, int *status);
+t_node							*process_command(t_node *node, int p_num);
+
+// executor4.c
+char							*find_executable(const char *cmd,
+									t_env *env_list);
 
 // expander.c
 void							expand(t_mini *mini, t_node *node,
@@ -227,7 +241,6 @@ void							free_token_list(t_token *token_list);
 bool							is_quote(char c);
 
 // tokenizer2.c
-
 int								get_opsize(t_mini *mini, char **line);
 t_token							*split_token_op(t_mini *mini, char **line);
 void							add_token_to_list(t_token **head,
