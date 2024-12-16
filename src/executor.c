@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 14:11:15 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 14:29:06 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,13 +98,11 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list,
 				{
 					if (ft_strchr(argv[0], '/'))
 						fprintf(stderr,
-							"minishell: %s:\
-							No such file or directory\n",
+							"minishell: %s: No such file or directory\n",
 							argv[0]);
 					else
 						fprintf(stderr,
-							"minishell: %s:\
-							command not found\n",
+							"minishell: %s: command not found\n",
 							argv[0]);
 					exit(127);
 				}
