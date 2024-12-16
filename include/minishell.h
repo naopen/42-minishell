@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 15:19:22 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:39:09 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,15 @@ void							execute_command(t_mini *mini, t_node *node, t_env *env_list, int *sta
 void							execute_pipeline(t_mini *mini, t_node *node,
 									int process);
 int								count_node(t_node *node);
+
+// executor3.c
+void	handle_command_not_found(char *argv0);
+void	update_status(t_mini *mini, int *status);
+t_node	*process_command(t_node *node, int p_num);
+
+// executor4.c
+char	*find_executable(const char *cmd, t_env *env_list);
+
 
 // expander.c
 void							expand(t_mini *mini, t_node *node,

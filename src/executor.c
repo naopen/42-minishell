@@ -6,69 +6,47 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 14:29:06 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:50:59 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include <sys/stat.h>
 
-static char	*find_executable(const char *cmd, t_env *env_list)
+static void	child_process(char **argv, char **envp, char *exec_path,
+		int *status)
 {
-	char	*path_env;
-	char	*path;
-	char	*dir;
-	char	*exec_path;
-	char	*tmp;
+	struct stat	st;
 
-	if (ft_strchr(cmd, '/'))
-		return (ft_strdup(cmd));
-	path_env = get_env_value(env_list, "PATH");
-	if (!path_env)
-		return (NULL);
-	path = ft_strdup(path_env);
-	dir = path;
-	while (dir && *dir)
+	(void)status;
+	if (execve(exec_path, argv, envp) == -1)
 	{
-		tmp = ft_strchr(dir, ':');
-		if (tmp)
-			*tmp = '\0';
-		exec_path = ft_strjoin(dir, "/");
-		if (!exec_path)
+		if (errno == ENOENT)
 		{
-			free(path);
-			return (NULL);
+			if (stat(exec_path, &st) == 0 && S_ISDIR(st.st_mode))
+			{
+				fprintf(stderr, "minishell: %s: Is a directory\n", argv[0]);
+				exit(126);
+			}
+			handle_command_not_found(argv[0]);
+			exit(127);
 		}
-		tmp = ft_strjoin(exec_path, cmd);
-		free(exec_path);
-		if (!tmp)
+		else if (errno == EACCES)
 		{
-			free(path);
-			return (NULL);
+			fprintf(stderr, "minishell: %s: Permission denied\n", argv[0]);
+			exit(126);
 		}
-		exec_path = tmp;
-		if (access(exec_path, X_OK) == 0)
-		{
-			free(path);
-			return (exec_path);
-		}
-		free(exec_path);
-		if (!tmp || !ft_strchr(dir + ft_strlen(dir) + 1, ':'))
-			break ;
-		dir = dir + ft_strlen(dir) + 1;
+		perror("minishell");
+		exit(126);
 	}
-	free(path);
-	return (NULL);
 }
 
 void	execute_external(t_mini *mini, char **argv, t_env *env_list,
 		int *status)
 {
-	pid_t		pid;
-	char		**envp;
-	char		*exec_path;
-	struct stat	st;
-	int			execve_ret;
+	pid_t	pid;
+	char	**envp;
+	char	*exec_path;
 
 	envp = NULL;
 	exec_path = find_executable(argv[0], env_list);
@@ -84,52 +62,10 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list,
 	if (!pid)
 	{
 		envp = env_to_envp(mini, env_list);
-		execve_ret = execve(exec_path, argv, envp);
-		if (execve_ret == -1)
-		{
-			if (errno == ENOENT)
-			{
-				if (stat(exec_path, &st) == 0 && S_ISDIR(st.st_mode))
-				{
-					fprintf(stderr, "minishell: %s: Is a directory\n", argv[0]);
-					exit(126);
-				}
-				else
-				{
-					if (ft_strchr(argv[0], '/'))
-						fprintf(stderr,
-							"minishell: %s: No such file or directory\n",
-							argv[0]);
-					else
-						fprintf(stderr,
-							"minishell: %s: command not found\n",
-							argv[0]);
-					exit(127);
-				}
-			}
-			else if (errno == EACCES)
-			{
-				fprintf(stderr, "minishell: %s: Permission denied\n", argv[0]);
-				exit(126);
-			}
-			else
-			{
-				perror("minishell");
-				exit(126);
-			}
-		}
+		child_process(argv, envp, exec_path, status);
 	}
 	waitpid(pid, status, 0);
-	if (WIFEXITED(*status))
-	{
-		*status = WEXITSTATUS(*status);
-		mini->status = *status;
-	}
-	else if (WIFSIGNALED(*status))
-	{
-		*status = 128 + WTERMSIG(*status);
-		mini->status = *status;
-	}
+	update_status(mini, status);
 	free(exec_path);
 	return ;
 }
@@ -138,14 +74,12 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list,
 		int *status)
 {
 	t_builtin_type	builtin_type;
-	int				ret;
 	int				i;
 
 	if (node == NULL)
 		return ;
 	i = 0;
-	ret = do_redirection(mini, node->redirects);
-	if (ret != 0)
+	if (do_redirection(mini, node->redirects) != 0)
 	{
 		*status = mini->status;
 		return ;
@@ -157,29 +91,12 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list,
 		mini->status = execute_builtin(mini, builtin_type, node->argv + i,
 				&env_list);
 	else if (node->argv[i])
-	{
 		execute_external(mini, node->argv + i, env_list, status);
-		mini->status = *status;
-	}
-	else if (!node->argv[i])
+	else
 	{
 		print_error(mini, "bash: : command not found\n", NULL);
 		mini->status = 127;
 	}
-	return ;
-}
-
-t_node	*process_command(t_node *node, int p_num)
-{
-	int	i;
-
-	i = 0;
-	while (i < p_num)
-	{
-		node = node->next;
-		i++;
-	}
-	return (node);
 }
 
 void	execute(t_mini *mini)

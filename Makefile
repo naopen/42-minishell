@@ -6,7 +6,7 @@
 #    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/12/16 15:18:30 by nkannan          ###   ########.fr        #
+#    Updated: 2024/12/16 15:36:35 by nkannan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,8 @@ SRCS = main.c \
        expander.c \
        executor.c \
 	   executor2.c \
+	   executor3.c \
+	   executor4.c \
        builtin.c \
 	   builtin2.c \
 	   builtin3.c \
