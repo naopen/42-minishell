@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 16:17:08 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:29:12 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,8 @@ void							execute_pipeline(t_mini *mini, t_node *node,
 int								count_node(t_node *node);
 
 // executor3.c
-void							handle_command_not_found(char *argv0, t_mini *mini);
+void							handle_command_not_found(char *argv0,
+									t_mini *mini);
 void							update_status(t_mini *mini, int *status);
 t_node							*process_command(t_node *node, int p_num);
 
@@ -252,7 +253,8 @@ bool							is_redirect(char c);
 void							in_quote(t_mini *mini, char **line);
 char							*get_env(t_mini *mini, char *env_name);
 
-char							*expand_variable(t_mini *mini, char *str, t_env *env_list, size_t i);
+char							*expand_variable(t_mini *mini, char *str,
+									t_env *env_list, size_t i);
 char							*get_env_name(t_mini *mini, const char *str);
 char							*expand_double_quote(t_mini *mini, char *str);
 void							remove_quotes(char **str);
