@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 16:29:12 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:33:58 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>
-# include <readline/history.h>
-# include <readline/readline.h>
 # include <signal.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <readline/history.h>
+# include <readline/readline.h>
 # include <unistd.h>
 # ifdef __linux__
 #  include <linux/limits.h>
@@ -112,6 +112,7 @@ typedef struct s_mini
 	int							backup_in;
 	int							backup_out;
 	int							status;
+	int							unable;
 }								t_mini;
 
 extern volatile sig_atomic_t	g_cntl_c;
