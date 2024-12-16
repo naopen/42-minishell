@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
+/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:06:20 by mkaihori          #+#    #+#             */
-/*   Updated: 2024/12/16 15:45:46 by mkaihori         ###   ########.fr       */
+/*   Updated: 2024/12/16 16:38:03 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	ex_var_value(t_env *env_list, char *var_name, char **result, size_t *j)
 	free(var_name);
 	if (var_value)
 	{
-		strcpy((*result) + (*j), var_value);
+		ft_strlcpy((*result) + (*j), var_value, ft_strlen(var_value) + 1);
 		*j += ft_strlen(var_value);
 	}
 	return ;
