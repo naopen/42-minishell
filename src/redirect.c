@@ -6,18 +6,11 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 12:29:30 by mkaihori          #+#    #+#             */
-/*   Updated: 2024/12/15 21:43:33 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 14:36:52 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-static int	print_redirect_error(t_mini *mini, char *filename)
-{
-	fprintf(stderr, "minishell: %s: %s\n", filename, strerror(errno));
-	mini->status = 1;
-	return (1);
-}
 
 int	redirect_in(t_mini *mini, t_redirect *red)
 {
@@ -67,37 +60,34 @@ int	redirect_append(t_mini *mini, t_redirect *red)
 	return (0);
 }
 
-int	do_redirection(t_mini *mini, t_redirect *redirect)
+static int	do_single_redirection(t_mini *mini, t_redirect *redirect)
 {
 	int	ret;
 
-	while (redirect)
+	ret = 0;
+	if (redirect->type == REDIRECT_IN)
+		ret = redirect_in(mini, redirect);
+	else if (redirect->type == REDIRECT_OUT)
+		ret = redirect_out(mini, redirect);
+	else if (redirect->type == REDIRECT_APPEND)
+		ret = redirect_append(mini, redirect);
+	else if (redirect->type == REDIRECT_HEREDOC)
+		ret = handle_heredoc(mini, redirect);
+	return (ret);
+}
+
+int	do_redirection(t_mini *mini, t_redirect *redirect)
+{
+	int			ret;
+	t_redirect	*current;
+
+	current = redirect;
+	while (current)
 	{
-		if (redirect->type == REDIRECT_IN)
-		{
-			ret = redirect_in(mini, redirect);
-			if (ret != 0)
-				return (ret);
-		}
-		else if (redirect->type == REDIRECT_OUT)
-		{
-			ret = redirect_out(mini, redirect);
-			if (ret != 0)
-				return (ret);
-		}
-		else if (redirect->type == REDIRECT_APPEND)
-		{
-			ret = redirect_append(mini, redirect);
-			if (ret != 0)
-				return (ret);
-		}
-		else if (redirect->type == REDIRECT_HEREDOC)
-		{
-			ret = handle_heredoc(mini, redirect);
-			if (ret != 0)
-				return (ret);
-		}
-		redirect = redirect->next;
+		ret = do_single_redirection(mini, current);
+		if (ret != 0)
+			return (ret);
+		current = current->next;
 	}
 	return (0);
 }
