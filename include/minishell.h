@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 13:56:44 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 14:06:03 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,10 +174,19 @@ char							*get_env(t_mini *mini, char *env_name);
 void							unset_env_value(t_env **env_list, const char *name);
 void							print_env_list(t_env *env_list, int flag);
 
+
 // executor.c
 void							execute(t_mini *mini);
 int								handle_heredoc(t_mini *mini,
 									t_redirect *redirect);
+t_node							*process_command(t_node *node, int p_num);
+void							execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status);
+
+
+// executor2.c
+void							execute_pipeline(t_mini *mini, t_node *node,
+									int process);
+int								count_node(t_node *node);
 
 // expander.c
 void							expand(t_mini *mini, t_node *node,
