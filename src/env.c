@@ -6,51 +6,11 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 13:59:35 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:18:10 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-void	add_env_list(t_env **head, t_env *new)
-{
-	t_env	*tmp;
-
-	if (*head == NULL)
-	{
-		*head = new;
-		return ;
-	}
-	tmp = *head;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = new;
-	return ;
-}
-
-t_env	*create_env_list(t_mini *mini, char **environ)
-{
-	t_env	*head;
-	t_env	*env;
-	char	*name;
-	char	*value;
-
-	head = NULL;
-	while (*environ)
-	{
-		name = ft_strndup(mini, *environ, ft_strchr(*environ, '=') - *environ);
-		value = ft_strdup(ft_strchr(*environ, '=') + 1);
-		env = (t_env *)malloc(sizeof(t_env));
-		if (env == NULL)
-			system_error(mini);
-		env->name = name;
-		env->value = value;
-		env->next = NULL;
-		add_env_list(&head, env);
-		environ++;
-	}
-	return (head);
-}
 
 char	*get_env_value(t_env *env_list, const char *name)
 {
@@ -61,6 +21,13 @@ char	*get_env_value(t_env *env_list, const char *name)
 		env_list = env_list->next;
 	}
 	return (NULL);
+}
+
+static void	handle_malloc_error(t_mini *mini, t_env *env)
+{
+	free(env->name);
+	free(env->value);
+	system_error(mini);
 }
 
 int	set_env_value(t_mini *mini, const char *name, const char *value)
@@ -74,23 +41,19 @@ int	set_env_value(t_mini *mini, const char *name, const char *value)
 		{
 			free(env->value);
 			env->value = ft_strdup(value);
-			if (env->value == NULL)
+			if (!env->value)
 				system_error(mini);
 			return (0);
 		}
 		env = env->next;
 	}
 	env = (t_env *)malloc(sizeof(t_env));
-	if (env == NULL)
+	if (!env)
 		system_error(mini);
 	env->name = ft_strdup(name);
 	env->value = ft_strdup(value);
-	if (env->name == NULL || env->value == NULL)
-	{
-		free(env->name);
-		free(env->value);
-		system_error(mini);
-	}
+	if (!env->name || !env->value)
+		handle_malloc_error(mini, env);
 	env->next = mini->env;
 	mini->env = env;
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 14:38:08 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:19:22 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,10 @@ void							print_error(t_mini *mini, char *msg, char *arg);
 char							*get_env(t_mini *mini, char *env_name);
 void							unset_env_value(t_env **env_list, const char *name);
 void							print_env_list(t_env *env_list, int flag);
+
+// env3.c
+void							add_env_list(t_env **head, t_env *new);
+t_env							*create_env_list(t_mini *mini, char **environ);
 
 // error.c
 int								print_redirect_error(t_mini *mini, char *filename);
