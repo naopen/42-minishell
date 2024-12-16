@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 15:54:00 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:59:58 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,5 +251,10 @@ bool							is_metachar(char c);
 bool							is_redirect(char c);
 void							in_quote(t_mini *mini, char **line);
 char							*get_env(t_mini *mini, char *env_name);
+
+char							*expand_variable(t_mini *mini, char *str, t_env *env_list, size_t i);
+char							*get_env_name(t_mini *mini, const char *str);
+char							*expand_double_quote(t_mini *mini, char *str);
+void							remove_quotes(char **str);
 
 #endif
