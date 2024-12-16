@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:33 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 14:02:33 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 14:11:15 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ static char	*find_executable(const char *cmd, t_env *env_list)
 	return (NULL);
 }
 
-void	execute_external(t_mini *mini, char **argv, t_env *env_list, \
-			int *status)
+void	execute_external(t_mini *mini, char **argv, t_env *env_list,
+		int *status)
 {
 	pid_t		pid;
 	char		**envp;
@@ -97,9 +97,15 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list, \
 				else
 				{
 					if (ft_strchr(argv[0], '/'))
-						fprintf(stderr, "minishell: %s: No such file or directory\n", argv[0]);
+						fprintf(stderr,
+							"minishell: %s:\
+							No such file or directory\n",
+							argv[0]);
 					else
-						fprintf(stderr, "minishell: %s: command not found\n", argv[0]);
+						fprintf(stderr,
+							"minishell: %s:\
+							command not found\n",
+							argv[0]);
 					exit(127);
 				}
 			}
@@ -130,7 +136,8 @@ void	execute_external(t_mini *mini, char **argv, t_env *env_list, \
 	return ;
 }
 
-void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status)
+void	execute_command(t_mini *mini, t_node *node, t_env *env_list,
+		int *status)
 {
 	t_builtin_type	builtin_type;
 	int				ret;
@@ -143,13 +150,14 @@ void	execute_command(t_mini *mini, t_node *node, t_env *env_list, int *status)
 	if (ret != 0)
 	{
 		*status = mini->status;
-		return;
+		return ;
 	}
 	while (node->argv[i] && node->argv[i][0] == '\0')
 		i++;
 	builtin_type = get_builtin_type(node->argv[i]);
 	if (builtin_type != BUILTIN_UNKNOWN)
-		mini->status = execute_builtin(mini, builtin_type, node->argv + i, &env_list);
+		mini->status = execute_builtin(mini, builtin_type, node->argv + i,
+				&env_list);
 	else if (node->argv[i])
 	{
 		execute_external(mini, node->argv + i, env_list, status);
