@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:17 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 13:07:03 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:27:42 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ t_node	*parse(t_mini *mini, t_token **token_list)
 	t_node	*node;
 	t_token	*token_head;
 
+	if (mini->unable)
+		return (NULL);
 	token_head = *token_list;
 	head = parse_process(mini, token_list);
 	node = head;

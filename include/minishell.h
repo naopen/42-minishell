@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 15:59:58 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:19:42 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>
-# include <readline/history.h>
-# include <readline/readline.h>
 # include <signal.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <readline/history.h>
+# include <readline/readline.h>
 # include <unistd.h>
 # ifdef __linux__
 #  include <linux/limits.h>
@@ -112,6 +112,7 @@ typedef struct s_mini
 	int							backup_in;
 	int							backup_out;
 	int							status;
+	int							unable;
 }								t_mini;
 
 extern volatile sig_atomic_t	g_cntl_c;

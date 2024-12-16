@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:43:04 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 14:38:02 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:24:58 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,13 @@ void	print_error(t_mini *mini, char *msg, char *arg)
 
 void	custom_error(t_mini *mini, char *msg, int error)
 {
-	print_error(mini, msg, NULL);
-	finish_mini(mini);
-	exit(error);
+	if (!mini->unable)
+	{
+		print_error(mini, msg, NULL);
+		mini->status = error;
+		mini->unable = 1;
+	}
+	return ;
 }
 
 int	print_redirect_error(t_mini *mini, char *filename)

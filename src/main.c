@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*   By: mkaihori <nana7hachi89gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:10:32 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 12:12:53 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:29:00 by mkaihori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void	free_mini(t_mini *mini)
 		free(mini->pid);
 	mini->pid = NULL;
 	mini->process = -1;
+	mini->unable = 0;
 	return ;
 }
 
@@ -157,9 +158,10 @@ int	main(int argc, char **argv, char **environ)
 			add_history(mini->line);
 			mini->token = tokenize(mini, mini->line);
 			mini->node = parse(mini, &(mini->token));
-			execute(mini);
-			free_mini(mini);
+			if (!mini->unable)
+				execute(mini);
 		}
+		free_mini(mini);
 		g_cntl_c = 0;
 	}
 	return (finish_mini(mini));
