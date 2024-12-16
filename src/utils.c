@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:55 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 21:43:41 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:27:43 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,122 +66,122 @@ char	*mn_substr(t_mini *mini, char const *s, unsigned int start, size_t len)
 	return (substr);
 }
 
-void	ft_strdel(char **as)
-{
-	if (as && *as)
-	{
-		free(*as);
-		*as = NULL;
-	}
-}
+// void	ft_strdel(char **as)
+// {
+// 	if (as && *as)
+// 	{
+// 		free(*as);
+// 		*as = NULL;
+// 	}
+// }
 
-int	ft_strarrlen(char **arr)
-{
-	int	len;
+// int	ft_strarrlen(char **arr)
+// {
+// 	int	len;
 
-	len = 0;
-	while (arr && arr[len])
-		len++;
-	return (len);
-}
+// 	len = 0;
+// 	while (arr && arr[len])
+// 		len++;
+// 	return (len);
+// }
 
-char	**ft_strarradd(t_mini *mini, char **arr, char *str)
-{
-	char	**new_arr;
-	int		len;
-	int		i;
+// char	**ft_strarradd(t_mini *mini, char **arr, char *str)
+// {
+// 	char	**new_arr;
+// 	int		len;
+// 	int		i;
 
-	len = ft_strarrlen(arr);
-	new_arr = (char **)malloc(sizeof(char *) * (len + 2));
-	if (new_arr == NULL)
-		system_error(mini);
-	i = 0;
-	while (i < len)
-	{
-		new_arr[i] = arr[i];
-		i++;
-	}
-	new_arr[i] = str;
-	new_arr[i + 1] = NULL;
-	free(arr);
-	return (new_arr);
-}
+// 	len = ft_strarrlen(arr);
+// 	new_arr = (char **)malloc(sizeof(char *) * (len + 2));
+// 	if (new_arr == NULL)
+// 		system_error(mini);
+// 	i = 0;
+// 	while (i < len)
+// 	{
+// 		new_arr[i] = arr[i];
+// 		i++;
+// 	}
+// 	new_arr[i] = str;
+// 	new_arr[i + 1] = NULL;
+// 	free(arr);
+// 	return (new_arr);
+// }
 
-char	*ft_strjoin_char_free(t_mini *mini, char *s1, char s2)
-{
-	char	*new_str;
+// char	*ft_strjoin_char_free(t_mini *mini, char *s1, char s2)
+// {
+// 	char	*new_str;
 
-	new_str = ft_strjoin(s1, &s2);
-	if (new_str == NULL)
-		system_error(mini);
-	free(s1);
-	return (new_str);
-}
+// 	new_str = ft_strjoin(s1, &s2);
+// 	if (new_str == NULL)
+// 		system_error(mini);
+// 	free(s1);
+// 	return (new_str);
+// }
 
-char	*ft_strjoin_free(t_mini *mini, char *s1, char *s2)
-{
-	char	*new_str;
+// char	*ft_strjoin_free(t_mini *mini, char *s1, char *s2)
+// {
+// 	char	*new_str;
 
-	new_str = ft_strjoin(s1, s2);
-	if (new_str == NULL)
-		system_error(mini);
-	free(s1);
-	free(s2);
-	return (new_str);
-}
+// 	new_str = ft_strjoin(s1, s2);
+// 	if (new_str == NULL)
+// 		system_error(mini);
+// 	free(s1);
+// 	free(s2);
+// 	return (new_str);
+// }
 
-char	*ft_strjoin_space_free(t_mini *mini, char *s1, char *s2)
-{
-	char	*new_str;
+// char	*ft_strjoin_space_free(t_mini *mini, char *s1, char *s2)
+// {
+// 	char	*new_str;
 
-	new_str = ft_strjoin(s1, " ");
-	if (new_str == NULL)
-		system_error(mini);
-	new_str = ft_strjoin_free(mini, new_str, s2);
-	return (new_str);
-}
+// 	new_str = ft_strjoin(s1, " ");
+// 	if (new_str == NULL)
+// 		system_error(mini);
+// 	new_str = ft_strjoin_free(mini, new_str, s2);
+// 	return (new_str);
+// }
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t size)
-{
-	size_t	i;
+// size_t	ft_strlcpy(char *dst, const char *src, size_t size)
+// {
+// 	size_t	i;
 
-	if (size == 0)
-		return (ft_strlen(src));
-	i = 0;
-	while (src[i] && i < size - 1)
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (ft_strlen(src));
-}
+// 	if (size == 0)
+// 		return (ft_strlen(src));
+// 	i = 0;
+// 	while (src[i] && i < size - 1)
+// 	{
+// 		dst[i] = src[i];
+// 		i++;
+// 	}
+// 	dst[i] = '\0';
+// 	return (ft_strlen(src));
+// }
 
-char	*ft_strtok(char *str, const char *delim)
-{
-	static char	*last;
-	char		*start;
+// char	*ft_strtok(char *str, const char *delim)
+// {
+// 	static char	*last;
+// 	char		*start;
 
-	if (str == NULL)
-		str = last;
-	if (str == NULL)
-		return (NULL);
-	while (*str && ft_strchr(delim, *str))
-		str++;
-	if (*str == '\0')
-		return (NULL);
-	start = str;
-	while (*str && !ft_strchr(delim, *str))
-		str++;
-	if (*str != '\0')
-	{
-		*str = '\0';
-		last = str + 1;
-	}
-	else
-		last = NULL;
-	return (start);
-}
+// 	if (str == NULL)
+// 		str = last;
+// 	if (str == NULL)
+// 		return (NULL);
+// 	while (*str && ft_strchr(delim, *str))
+// 		str++;
+// 	if (*str == '\0')
+// 		return (NULL);
+// 	start = str;
+// 	while (*str && !ft_strchr(delim, *str))
+// 		str++;
+// 	if (*str != '\0')
+// 	{
+// 		*str = '\0';
+// 		last = str + 1;
+// 	}
+// 	else
+// 		last = NULL;
+// 	return (start);
+// }
 
 // int	ft_fnmatch(const char *pattern, const char *string, int flags)
 // {

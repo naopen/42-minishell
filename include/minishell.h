@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 13:20:41 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:51:37 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,21 @@ t_builtin_type					get_builtin_type(const char *cmd);
 int								execute_builtin(t_mini *mini,
 									t_builtin_type type, char **argv,
 									t_env **env_list);
+
+// builtin2.c
+int								builtin_unset(char **argv, t_env **env_list);
+int								builtin_env(char **argv, t_env **env_list);
+int								builtin_pwd(char **argv);
+int								builtin_exit(t_mini *mini, char **argv);
+
+
+
+// builtin3.c
+bool							is_valid_identifier(t_mini *mini,
+									const char *str);
+int								builtin_export(t_mini *mini, char **argv,
+									t_env **env_list);
+
 
 // env.c
 t_env							*create_env_list(t_mini *mini, char **environ);

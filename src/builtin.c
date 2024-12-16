@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:08:52 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 21:42:46 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:48:34 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,140 +78,6 @@ static int	builtin_cd(t_mini *mini, char **argv)
 		}
 	}
 	return (0);
-}
-
-static int	builtin_pwd(char **argv)
-{
-	char	cwd[PATH_MAX];
-
-	(void)argv;
-	if (getcwd(cwd, sizeof(cwd)) == NULL)
-	{
-		perror("getcwd");
-		return (1);
-	}
-	printf("%s\n", cwd);
-	return (0);
-}
-
-static bool	is_valid_identifier(t_mini *mini, const char *str)
-{
-	char	*equals_pos;
-	char	*name;
-	int		i;
-
-	if (!str || !*str)
-		return (false);
-	equals_pos = ft_strchr(str, '=');
-	if (equals_pos)
-	{
-		name = ft_strndup(mini, str, equals_pos - str);
-		if (!name)
-			system_error(mini);
-	}
-	else
-	{
-		name = ft_strdup(str);
-		if (!name)
-			system_error(mini);
-	}
-	if (!ft_isalpha(name[0]) && name[0] != '_')
-	{
-		free(name);
-		return (false);
-	}
-	i = 1;
-	while (name[i])
-	{
-		if (!ft_isalnum(name[i]) && name[i] != '_')
-		{
-			free(name);
-			return (false);
-		}
-		i++;
-	}
-	free(name);
-	return (true);
-}
-
-static int	builtin_export(t_mini *mini, char **argv, t_env **env_list)
-{
-	char	*equals_pos;
-	char	*name;
-	char	*value;
-	int		status;
-	int		i;
-
-	if (argv[1] == NULL)
-	{
-		print_env_list(*env_list, 1);
-		return (0);
-	}
-	status = 0;
-	i = 1;
-	while (argv[i])
-	{
-		if (!is_valid_identifier(mini, argv[i]))
-		{
-			ft_putstr_fd("minishell: export: `", STDERR_FILENO);
-			ft_putstr_fd(argv[i], STDERR_FILENO);
-			ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
-			status = 1;
-			i++;
-			continue ;
-		}
-		equals_pos = ft_strchr(argv[i], '=');
-		if (!equals_pos)
-			set_env_value(mini, argv[i], "");
-		else
-		{
-			name = ft_strndup(mini, argv[i], equals_pos - argv[i]);
-			if (!name)
-				system_error(mini);
-			value = equals_pos + 1;
-			set_env_value(mini, name, value);
-			free(name);
-		}
-		i++;
-	}
-	return (status);
-}
-
-static int	builtin_unset(char **argv, t_env **env_list)
-{
-	if (argv[1] == NULL)
-		return (0);
-	unset_env_value(env_list, argv[1]);
-	return (0);
-}
-
-static int	builtin_env(char **argv, t_env **env_list)
-{
-	(void)argv;
-	print_env_list(*env_list, 0);
-	return (0);
-}
-
-static int	builtin_exit(t_mini *mini, char **argv)
-{
-	int	exit_status;
-
-	if (argv[1] == NULL)
-		exit(0);
-	if (ft_isnumber(argv[1]) == false)
-	{
-		fprintf(stderr, "minishell: exit: %s: numeric argument required\n",
-			argv[1]);
-		exit(2);
-	}
-	if (argv[2] != NULL)
-	{
-		ft_putendl_fd("minishell: exit: too many arguments", STDERR_FILENO);
-		mini->status = 1;
-		return (1);
-	}
-	exit_status = ft_atoi(argv[1]);
-	exit(exit_status);
 }
 
 t_builtin_type	get_builtin_type(const char *cmd)
