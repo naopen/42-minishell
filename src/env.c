@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:09:10 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/15 21:42:57 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:59:35 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,46 +96,6 @@ int	set_env_value(t_mini *mini, const char *name, const char *value)
 	return (0);
 }
 
-void	unset_env_value(t_env **env_list, const char *name)
-{
-	t_env	*prev;
-	t_env	*curr;
-
-	prev = NULL;
-	curr = *env_list;
-	while (curr)
-	{
-		if (ft_strcmp(curr->name, name) == 0)
-		{
-			if (prev)
-				prev->next = curr->next;
-			else
-				*env_list = curr->next;
-			free(curr->name);
-			free(curr->value);
-			free(curr);
-			return ;
-		}
-		prev = curr;
-		curr = curr->next;
-	}
-}
-
-void	print_env_list(t_env *env_list, int flag)
-{
-	while (env_list)
-	{
-		if (flag)
-		{
-			printf("declare -x ");
-			printf("%s=\"%s\"\n", env_list->name, env_list->value);
-		}
-		else
-			printf("%s=%s\n", env_list->name, env_list->value);
-		env_list = env_list->next;
-	}
-}
-
 char	**env_to_envp(t_mini *mini, t_env *env_list)
 {
 	char	**envp;
@@ -163,18 +123,4 @@ char	**env_to_envp(t_mini *mini, t_env *env_list)
 	}
 	envp[i] = NULL;
 	return (envp);
-}
-
-char	*get_env(t_mini *mini, char *env_name)
-{
-	t_env	*tmp;
-
-	tmp = mini->env;
-	while (tmp)
-	{
-		if (ft_strcmp(tmp->name, env_name) == 0)
-			return (tmp->value);
-		tmp = tmp->next;
-	}
-	return (NULL);
 }

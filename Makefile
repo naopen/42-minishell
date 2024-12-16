@@ -6,7 +6,7 @@
 #    By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/08 17:13:55 by nkannan           #+#    #+#              #
-#    Updated: 2024/12/16 13:52:10 by nkannan          ###   ########.fr        #
+#    Updated: 2024/12/16 13:55:26 by nkannan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,7 @@ SRCS = main.c \
 	   builtin2.c \
 	   builtin3.c \
        env.c \
+	   env2.c \
        utils.c \
 	   tokenizer_utils.c \
 	   error.c \

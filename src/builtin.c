@@ -101,7 +101,8 @@ t_builtin_type	get_builtin_type(const char *cmd)
 	return (BUILTIN_UNKNOWN);
 }
 
-int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv, t_env **env_list)
+int	execute_builtin(t_mini *mini, t_builtin_type type, char **argv,
+		t_env **env_list)
 {
 	if (type == BUILTIN_ECHO)
 		return (builtin_echo(argv));

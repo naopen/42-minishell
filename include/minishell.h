@@ -6,7 +6,7 @@
 /*   By: nkannan <nkannan@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 17:06:37 by nkannan           #+#    #+#             */
-/*   Updated: 2024/12/16 13:51:37 by nkannan          ###   ########.fr       */
+/*   Updated: 2024/12/16 13:56:44 by nkannan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,11 @@ int								do_redirection(t_mini *mini,
 int								finish_mini(t_mini *mini);
 void							free_node(t_node *node);
 void							print_error(t_mini *mini, char *msg, char *arg);
+
+// env2.c
+char							*get_env(t_mini *mini, char *env_name);
+void							unset_env_value(t_env **env_list, const char *name);
+void							print_env_list(t_env *env_list, int flag);
 
 // executor.c
 void							execute(t_mini *mini);
